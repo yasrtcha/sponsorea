@@ -51,7 +51,7 @@ class EventController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('event.dashboard')->with('success', 'Event dan Proposal berhasil diunggah!');    
+        return redirect()->route('event.index')->with('success', 'Event dan Proposal berhasil diunggah!');    
     }
 
     public function edit(Event $event)

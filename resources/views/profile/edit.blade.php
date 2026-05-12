@@ -5,19 +5,31 @@
 
 @section('content')
 @if(session('success'))
-<div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
-     class="mb-6 p-4 rounded-2xl bg-[#f0f9f8] border border-teal-100 flex items-start gap-3 animate-fade-in-down">
-    <div class="w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center shrink-0">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+    <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+        <div class="bg-teal-100 p-1.5 rounded-full">
+            <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+            <p class="text-[11px] font-medium text-teal-600">{{ session('success') }}</p>
+        </div>
+        <button onclick="closeToast()" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
-    <div class="flex-1 mt-1.5">
-        <h3 class="font-extrabold text-teal-800 text-sm">Berhasil!</h3>
-        <p class="text-sm font-bold text-teal-700 mt-0.5">{{ session('success') }}</p>
-    </div>
-    <button @click="show = false" class="text-teal-600 hover:text-teal-800 mt-1.5">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-    </button>
-</div>
+    <script>
+        setTimeout(() => closeToast(), 4000);
+        function closeToast() {
+            const toast = document.getElementById('toast-success');
+            if(toast) {
+                toast.classList.replace('translate-y-0', '-translate-y-4');
+                toast.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }
+        }
+    </script>
 @endif
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 xl:p-12 mb-10 w-full">

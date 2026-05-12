@@ -3,6 +3,33 @@
 @section('title', 'Super Admin Dashboard - Sponsorea')
 
 @section('content')
+@if(session('success'))
+    <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+        <div class="bg-teal-100 p-1.5 rounded-full">
+            <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+            <p class="text-[11px] font-medium text-teal-600">{{ session('success') }}</p>
+        </div>
+        <button onclick="closeToast()" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <script>
+        setTimeout(() => closeToast(), 4000);
+        function closeToast() {
+            const toast = document.getElementById('toast-success');
+            if(toast) {
+                toast.classList.replace('translate-y-0', '-translate-y-4');
+                toast.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }
+        }
+    </script>
+@endif
 <div class="space-y-6">
     
     <!-- Header Title -->
@@ -90,80 +117,52 @@
         </div>
     </div>
 
-    <!-- Progress Bars Section -->
+    <!-- Progress Indicators Section -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <!-- Event to Company -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+        <!-- Event to Company (Stat Cards) -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+            <div class="px-5 py-4 border-b border-gray-50">
                 <h3 class="text-sm font-extrabold text-[#3d3d3d]">Pengajuan (Event → Perusahaan)</h3>
             </div>
-            <div class="p-6 space-y-5">
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Disetujui</span>
-                        <span class="text-sm font-extrabold text-teal-600">{{ $eventRequestsAccepted }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-teal-500 h-2.5 rounded-full" style="width: {{ $eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected > 0 ? ($eventRequestsAccepted / ($eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+            <div class="p-5 grid grid-cols-3 gap-3 flex-grow content-center">
+                <!-- Disetujui -->
+                <div class="bg-teal-50/50 rounded-xl p-4 border border-teal-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-teal-600 uppercase tracking-wider mb-1">Disetujui</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $eventRequestsAccepted }}</h3>
                 </div>
-                
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Menunggu</span>
-                        <span class="text-sm font-extrabold text-amber-600">{{ $eventRequestsPending }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-amber-500 h-2.5 rounded-full" style="width: {{ $eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected > 0 ? ($eventRequestsPending / ($eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+                <!-- Menunggu -->
+                <div class="bg-amber-50/50 rounded-xl p-4 border border-amber-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Menunggu</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $eventRequestsPending }}</h3>
                 </div>
-                
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Ditolak</span>
-                        <span class="text-sm font-extrabold text-red-600">{{ $eventRequestsRejected }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-red-500 h-2.5 rounded-full" style="width: {{ $eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected > 0 ? ($eventRequestsRejected / ($eventRequestsAccepted + $eventRequestsPending + $eventRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+                <!-- Ditolak -->
+                <div class="bg-red-50/50 rounded-xl p-4 border border-red-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-1">Ditolak</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $eventRequestsRejected }}</h3>
                 </div>
             </div>
         </div>
 
-        <!-- Company to Event -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+        <!-- Company to Event (Stat Cards) -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+            <div class="px-5 py-4 border-b border-gray-50">
                 <h3 class="text-sm font-extrabold text-[#3d3d3d]">Penawaran (Perusahaan → Event)</h3>
             </div>
-            <div class="p-6 space-y-5">
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Disetujui</span>
-                        <span class="text-sm font-extrabold text-teal-600">{{ $companyRequestsAccepted }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-teal-500 h-2.5 rounded-full" style="width: {{ $companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected > 0 ? ($companyRequestsAccepted / ($companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+            <div class="p-5 grid grid-cols-3 gap-3 flex-grow content-center">
+                <!-- Disetujui -->
+                <div class="bg-teal-50/50 rounded-xl p-4 border border-teal-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-teal-600 uppercase tracking-wider mb-1">Disetujui</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $companyRequestsAccepted }}</h3>
                 </div>
-
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Menunggu</span>
-                        <span class="text-sm font-extrabold text-amber-600">{{ $companyRequestsPending }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-amber-500 h-2.5 rounded-full" style="width: {{ $companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected > 0 ? ($companyRequestsPending / ($companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+                <!-- Menunggu -->
+                <div class="bg-amber-50/50 rounded-xl p-4 border border-amber-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Menunggu</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $companyRequestsPending }}</h3>
                 </div>
-
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-600">Ditolak</span>
-                        <span class="text-sm font-extrabold text-red-600">{{ $companyRequestsRejected }}</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="bg-red-500 h-2.5 rounded-full" style="width: {{ $companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected > 0 ? ($companyRequestsRejected / ($companyRequestsAccepted + $companyRequestsPending + $companyRequestsRejected)) * 100 : 0 }}%"></div>
-                    </div>
+                <!-- Ditolak -->
+                <div class="bg-red-50/50 rounded-xl p-4 border border-red-100/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-1">Ditolak</p>
+                    <h3 class="text-2xl font-black text-[#3d3d3d]">{{ $companyRequestsRejected }}</h3>
                 </div>
             </div>
         </div>

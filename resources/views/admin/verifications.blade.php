@@ -42,14 +42,31 @@
     </div>
 
     @if(session('success'))
-        <div class="rounded-2xl bg-[#f0f9f8] p-4 border border-teal-200 shadow-sm" role="alert">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+        <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+            <div class="bg-teal-100 p-1.5 rounded-full">
+                <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <p class="text-[13px] font-bold text-teal-800">{{ session('success') }}</p>
             </div>
+            <div>
+                <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+                <p class="text-[11px] font-medium text-teal-600">{{ session('success') }}</p>
+            </div>
+            <button onclick="closeToast()" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
         </div>
+        <script>
+            setTimeout(() => closeToast(), 4000);
+            function closeToast() {
+                const toast = document.getElementById('toast-success');
+                if(toast) {
+                    toast.classList.replace('translate-y-0', '-translate-y-4');
+                    toast.classList.replace('opacity-100', 'opacity-0');
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }
+        </script>
     @endif
 
     <!-- Control Bar (Tabs) -->

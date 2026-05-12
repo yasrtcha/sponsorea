@@ -4,7 +4,31 @@
 
 @section('content')
     @if(session('success'))
-        <div class="mb-6 p-4 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 font-bold">{{ session('success') }}</div>
+        <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+            <div class="bg-teal-100 p-1.5 rounded-full">
+                <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <div>
+                <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+                <p class="text-[11px] font-medium text-teal-600">{{ session('success') }}</p>
+            </div>
+            <button onclick="closeToast()" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <script>
+            setTimeout(() => closeToast(), 4000);
+            function closeToast() {
+                const toast = document.getElementById('toast-success');
+                if(toast) {
+                    toast.classList.replace('translate-y-0', '-translate-y-4');
+                    toast.classList.replace('opacity-100', 'opacity-0');
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }
+        </script>
     @endif
 
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

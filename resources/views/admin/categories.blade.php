@@ -15,7 +15,7 @@
 
     @if(session('success'))
         <!-- Toast Notification -->
-        <div id="toast-success" class="fixed top-8 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-[1.5rem] shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+        <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
             <div class="bg-teal-100 p-1.5 rounded-full">
                 <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

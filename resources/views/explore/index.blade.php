@@ -40,22 +40,59 @@
 
             <!-- Notifications -->
             @if(session('error'))
-                <div class="mb-4 bg-red-50 border border-red-200 p-4 rounded-2xl shadow-sm flex items-start justify-between">
-                    <div>
-                        <p class="text-[13px] text-red-700 font-bold">{{ session('error') }}</p>
+                <div id="toast-error" class="fixed top-20 right-8 z-50 bg-red-50 border border-red-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+                    <div class="bg-red-100 p-1.5 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
-                    @if(auth()->user()->role === 'event')
-                        <a href="{{ route('event.index') }}" class="text-[13px] font-extrabold text-red-700 hover:text-red-800 underline">Buat Event</a>
-                    @else
-                        <a href="{{ route('company.index') }}" class="text-[13px] font-extrabold text-red-700 hover:text-red-800 underline">Buat Penawaran</a>
-                    @endif
+                    <div>
+                        <h4 class="font-bold text-[13px] text-red-800">Perhatian!</h4>
+                        <p class="text-[11px] font-medium text-red-600">{{ session('error') }}</p>
+                    </div>
+                    <button onclick="closeErrorToast()" class="ml-4 text-red-400 hover:text-red-600 transition-colors bg-red-100 rounded-full p-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
+                <script>
+                    setTimeout(() => closeErrorToast(), 4000);
+                    function closeErrorToast() {
+                        const toast = document.getElementById('toast-error');
+                        if(toast) {
+                            toast.classList.replace('translate-y-0', '-translate-y-4');
+                            toast.classList.replace('opacity-100', 'opacity-0');
+                            setTimeout(() => toast.remove(), 500);
+                        }
+                    }
+                </script>
             @endif
 
             @if(session('success'))
-                <div class="mb-4 bg-[#f0f9f8] border border-teal-200 p-4 rounded-2xl shadow-sm">
-                    <p class="text-[13px] text-teal-700 font-bold">{{ session('success') }}</p>
+                <div id="toast-success" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+                    <div class="bg-teal-100 p-1.5 rounded-full">
+                        <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+                        <p class="text-[11px] font-medium text-teal-600">{{ session('success') }}</p>
+                    </div>
+                    <button onclick="closeSuccessToast()" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
+                <script>
+                    setTimeout(() => closeSuccessToast(), 4000);
+                    function closeSuccessToast() {
+                        const toast = document.getElementById('toast-success');
+                        if(toast) {
+                            toast.classList.replace('translate-y-0', '-translate-y-4');
+                            toast.classList.replace('opacity-100', 'opacity-0');
+                            setTimeout(() => toast.remove(), 500);
+                        }
+                    }
+                </script>
             @endif
 
             <!-- Control Bar (Tabs & Filters) -->
@@ -681,7 +718,7 @@
             const message = document.getElementById('requestMessage').value;
 
             if (!assetId || !message.trim()) {
-                alert('Mohon isi semua field!');
+                showErrorToast('Mohon isi semua field!');
                 return;
             }
 
@@ -703,17 +740,79 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('✅ Pengajuan berhasil dikirim!');
+                    showSuccessToast('Pengajuan berhasil dikirim!');
                     closeRequestModal();
                 } else {
-                    alert('❌ Error: ' + (data.message || 'Terjadi kesalahan'));
+                    showErrorToast(data.message || 'Terjadi kesalahan');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('❌ Gagal mengirim pengajuan');
+                showErrorToast('Gagal mengirim pengajuan');
             });
         });
+
+        function showSuccessToast(message) {
+            const toastId = 'toast-success-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="fixed top-20 right-8 z-50 bg-[#f0f9f8] border border-teal-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+                    <div class="bg-teal-100 p-1.5 rounded-full">
+                        <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-[13px] text-teal-800">Berhasil!</h4>
+                        <p class="text-[11px] font-medium text-teal-600">${message}</p>
+                    </div>
+                    <button onclick="closeSuccessToast('${toastId}')" class="ml-4 text-teal-400 hover:text-teal-600 transition-colors bg-teal-50 rounded-full p-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', toastHtml);
+            setTimeout(() => closeSuccessToast('${toastId}'), 4000);
+        }
+
+        function closeSuccessToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if(toast) {
+                toast.classList.replace('translate-y-0', '-translate-y-4');
+                toast.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }
+        }
+
+        function showErrorToast(message) {
+            const toastId = 'toast-error-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="fixed top-20 right-8 z-50 bg-red-50 border border-red-200 px-6 py-4 rounded-3 shadow-lg flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100">
+                    <div class="bg-red-100 p-1.5 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-[13px] text-red-800">Perhatian!</h4>
+                        <p class="text-[11px] font-medium text-red-600">${message}</p>
+                    </div>
+                    <button onclick="closeErrorToast('${toastId}')" class="ml-4 text-red-400 hover:text-red-600 transition-colors bg-red-100 rounded-full p-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', toastHtml);
+            setTimeout(() => closeErrorToast('${toastId}'), 4000);
+        }
+
+        function closeErrorToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if(toast) {
+                toast.classList.replace('translate-y-0', '-translate-y-4');
+                toast.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }
+        }
 
         // Close modal on outside click
         document.getElementById('requestModal').addEventListener('click', function(e) {

@@ -26,6 +26,16 @@
         </div>
 
         <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 rounded-xl bg-yellow-50 text-yellow-500 flex items-center justify-center">
+                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-500 mb-1">Permintaan Menunggu</p>
+                <h3 class="text-3xl font-black text-[#3d3d3d]">{{ $pendingIncomingRequests ?? 0 }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
             <div class="w-14 h-14 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
                 <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
             </div>
@@ -42,6 +52,16 @@
             <div>
                 <p class="text-sm font-bold text-gray-500 mb-1">Kerjasama Disetujui</p>
                 <h3 class="text-3xl font-black text-[#3d3d3d]">{{ $approvedRequests ?? 0 }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-500 mb-1">Notifikasi Baru</p>
+                <h3 class="text-3xl font-black text-[#3d3d3d]">{{ $newNotifications ?? 0 }}</h3>
             </div>
         </div>
     </div>

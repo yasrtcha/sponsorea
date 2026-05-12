@@ -52,7 +52,7 @@ class SponsorOfferController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()->route('company.dashboard')->with('success', 'Penawaran Sponsor berhasil dipublikasikan!');
+        return redirect()->route('company.index')->with('success', 'Penawaran Sponsor berhasil dipublikasikan!');
     }
 
     public function edit(SponsorOffer $sponsorOffer)

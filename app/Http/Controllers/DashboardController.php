@@ -27,7 +27,15 @@ class DashboardController extends Controller
             $query->where('user_id', $userId);
         })->where('status', 'approved')->count();
 
-        return view('event.dashboard', compact('totalEvents', 'rejectedRequests', 'approvedRequests'));
+        // MENGHITUNG YANG PENDING
+        $pendingRequests = SponsorshipRequest::whereHas('event', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->where('status', 'pending')->count();
+
+        // MENGHITUNG NOTIFIKASI YANG BELUM DIBACA
+        $newNotifications = auth()->user()->notifications()->whereNull('read_at')->count();
+
+        return view('event.dashboard', compact('totalEvents', 'rejectedRequests', 'approvedRequests', 'pendingRequests', 'newNotifications'));
     }
 
     public function companyDashboard()
@@ -48,6 +56,14 @@ class DashboardController extends Controller
             $query->where('user_id', $userId);
         })->where('status', 'approved')->count();
 
-        return view('company.dashboard', compact('totalOffers', 'rejectedRequests', 'approvedRequests'));
+        // MENGHITUNG YANG PENDING
+        $pendingIncomingRequests = SponsorshipRequest::whereHas('sponsorOffer', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->where('status', 'pending')->count();
+
+        // MENGHITUNG NOTIFIKASI YANG BELUM DIBACA
+        $newNotifications = auth()->user()->notifications()->whereNull('read_at')->count();
+
+        return view('company.dashboard', compact('totalOffers', 'rejectedRequests', 'approvedRequests', 'pendingIncomingRequests', 'newNotifications'));
     }
 }
