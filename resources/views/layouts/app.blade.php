@@ -9,10 +9,12 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
     
-    @if(auth()->check())
-        @include('components.navbar-app')
-    @else
-        @include('components.navbar')
+    @if(!View::hasSection('hide_navbar'))
+        @if(auth()->check())
+            @include('components.navbar-app')
+        @else
+            @include('components.navbar')
+        @endif
     @endif
 
     <main>

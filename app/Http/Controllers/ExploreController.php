@@ -80,7 +80,45 @@ class ExploreController extends Controller
         // Ambil semua event_type dan funding_type untuk filter dropdown
         $eventTypes = EventType::orderBy('name')->get();
         $fundingTypes = FundingType::orderBy('name')->get();
+
+        // Ambil data pending request milik user untuk menandai kartu yang sudah ada pengajuan menunggu
+        $pendingOfferIds = collect();
+        $pendingEventIds = collect();
+
+        if (auth()->user()->role === 'event') {
+            // Untuk mahasiswa: cari offer mana yang SEMUA event-nya sudah pending
+            $myEventIds = Event::where('user_id', auth()->id())
+                ->where('status', '!=', 'completed')
+                ->pluck('id');
+            
+            if ($myEventIds->isNotEmpty()) {
+                $myEventCount = $myEventIds->count();
+                
+                // Offer yang SEMUA event user sudah punya pending request
+                $pendingOfferIds = \App\Models\SponsorshipRequest::whereIn('event_id', $myEventIds)
+                    ->where('status', 'pending')
+                    ->groupBy('sponsor_offer_id')
+                    ->havingRaw('COUNT(DISTINCT event_id) >= ?', [$myEventCount])
+                    ->pluck('sponsor_offer_id');
+            }
+        } elseif (auth()->user()->role === 'company') {
+            // Untuk perusahaan: cari event mana yang SEMUA offer-nya sudah pending
+            $myOfferIds = \App\Models\SponsorOffer::where('user_id', auth()->id())
+                ->where('status', 'active')
+                ->pluck('id');
+            
+            if ($myOfferIds->isNotEmpty()) {
+                $myOfferCount = $myOfferIds->count();
+                
+                // Event yang SEMUA offer user sudah punya pending request
+                $pendingEventIds = \App\Models\SponsorshipRequest::whereIn('sponsor_offer_id', $myOfferIds)
+                    ->where('status', 'pending')
+                    ->groupBy('event_id')
+                    ->havingRaw('COUNT(DISTINCT sponsor_offer_id) >= ?', [$myOfferCount])
+                    ->pluck('event_id');
+            }
+        }
         
-        return view('explore.index', compact('events', 'offers', 'query', 'eventType', 'fundingType', 'eventTypes', 'fundingTypes'));
+        return view('explore.index', compact('events', 'offers', 'query', 'eventType', 'fundingType', 'eventTypes', 'fundingTypes', 'pendingOfferIds', 'pendingEventIds'));
     }
 }

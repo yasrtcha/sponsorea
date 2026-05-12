@@ -24,13 +24,12 @@ use App\Http\Controllers\AdminController;
 // =========================================================================
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/register', [RegisterController::class, 'show'])->name('register');
-    Route::post('/register', [RegisterController::class, 'store']);
-    
-    Route::get('/login', [LoginController::class, 'show'])->name('login');
-    Route::post('/login', [LoginController::class, 'authenticate']);
-});
+// Auth Routes
+Route::get('/login', [LoginController::class, 'show'])->name('login');
+Route::post('/login', [LoginController::class, 'authenticate'])->middleware('guest');
+
+Route::get('/register', [RegisterController::class, 'show'])->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->middleware('guest');
 
 // =========================================================================
 // 2. ROUTE GLOBAL AUTH (Harus Login Dulu - Akses Bebas untuk Semua Role)
@@ -41,11 +40,6 @@ Route::middleware(['auth', 'verify.account.status'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Notifikasi
-    Route::get('/notifications', function () {
-        $notifications = auth()->user()->notifications()->paginate(15);
-        return view('notifications.index', compact('notifications'));
-    })->name('notifications.index');
-    
     Route::post('/notifications/{id}/read', function ($id) {
         auth()->user()->notifications()->findOrFail($id)->markAsRead();
         return back();
@@ -78,9 +72,8 @@ Route::middleware(['auth', 'verify.account.status'])->group(function () {
     // Halaman Lihat Profil User Publik
     Route::get('/user/{user}/profile', [ProfileController::class, 'show'])->name('user.profile.show');
 
-
     // =========================================================================
-    // 3. AREA KHUSUS MAHASISWA / EVENT
+    // 3. AREA KHUSUS PENYELENGGARA EVENT / MAHASISWA
     // =========================================================================
     Route::middleware('role:event')->group(function () {
         

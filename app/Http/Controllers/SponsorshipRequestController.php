@@ -24,28 +24,88 @@ class SponsorshipRequestController extends Controller
         // JIKA MAHASISWA NGAJUIN KE PERUSAHAAN
         if ($type === 'offer' && $role === 'event') {
             $target = SponsorOffer::findOrFail($id);
-            $myAssets = Event::where('user_id', auth()->id())->get(); // AMBIL data event
+
+            // Ambil ID event yang sudah punya pending request dengan offer ini
+            $pendingEventIds = SponsorshipRequest::where('sponsor_offer_id', $id)
+                ->where('status', 'pending')
+                ->pluck('event_id');
+
+            $myAssets = Event::where('user_id', auth()->id())
+                            ->where('status', '!=', 'completed')
+                            ->whereNotIn('id', $pendingEventIds) // Filter yang sudah pending
+                            ->get();
             
-            if ($myAssets->isEmpty()) {
+            // Cek apakah user punya event sama sekali
+            $totalEvents = Event::where('user_id', auth()->id())
+                            ->where('status', '!=', 'completed')
+                            ->count();
+
+            if ($totalEvents === 0) {
+                if (request()->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Kamu belum membuat event'], 400);
+                }
                 return redirect()->back()->with('error', 'Oops! Kamu belum membuat event. Silakan buat profil event kamu terlebih dahulu di Dashboard Event sebelum mengajukan proposal.');
+            }
+
+            if ($myAssets->isEmpty()) {
+                if (request()->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Semua event kamu sudah memiliki pengajuan yang sedang menunggu ke program sponsor ini.'], 409);
+                }
+                return redirect()->back()->with('error', 'Semua event kamu sudah memiliki pengajuan yang sedang menunggu ke program sponsor ini.');
             }
         } 
         
         // JIKA PERUSAHAAN NGAJUIN KE MAHASISWA
         elseif ($role === 'company' && $type === 'event') {
             $target = Event::findOrFail($id);
-            $myAssets = SponsorOffer::where('user_id', auth()->id())->get(); // FIX: AMBIL data penawaran (bukan cuma di-count)
+
+            // Ambil ID offer yang sudah punya pending request dengan event ini
+            $pendingOfferIds = SponsorshipRequest::where('event_id', $id)
+                ->where('status', 'pending')
+                ->pluck('sponsor_offer_id');
+
+            $myAssets = SponsorOffer::where('user_id', auth()->id())
+                                   ->where('status', 'active')
+                                   ->whereNotIn('id', $pendingOfferIds) // Filter yang sudah pending
+                                   ->get();
             
-            if ($myAssets->isEmpty()) {
+            // Cek apakah user punya offer sama sekali
+            $totalOffers = SponsorOffer::where('user_id', auth()->id())
+                                   ->where('status', 'active')
+                                   ->count();
+
+            if ($totalOffers === 0) {
+                if (request()->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Perusahaan belum punya penawaran sponsor'], 400);
+                }
                 return redirect()->back()->with('error', 'Oops! Perusahaan Anda belum memiliki penawaran sponsor aktif. Silakan buat program sponsor terlebih dahulu.');
+            }
+
+            if ($myAssets->isEmpty()) {
+                if (request()->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Semua program sponsor Anda sudah memiliki pengajuan yang sedang menunggu ke event ini.'], 409);
+                }
+                return redirect()->back()->with('error', 'Semua program sponsor Anda sudah memiliki pengajuan yang sedang menunggu ke event ini.');
             }
         }
 
         // BENTENG KEAMANAN: Jika URL dimanipulasi dan target tidak ditemukan
         if (!$target) {
+            if (request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+            }
             return redirect()->route('explore.index')->with('error', 'Akses tidak diizinkan atau data tidak ditemukan.');
         }
 
+        // Jika AJAX request, return JSON dengan assets
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'assets' => $myAssets->map(fn($asset) => ['id' => $asset->id, 'title' => $asset->title])->values()->all()
+            ]);
+        }
+
+        // Jika regular request, return view
         return view('request.create', compact('target', 'myAssets', 'type'));
     }
 
@@ -76,16 +136,19 @@ class SponsorshipRequestController extends Controller
             $data['sponsor_offer_id'] = $request->my_asset_id;
         }
 
-    // Cek apakah ada pengajuan yang statusnya masih PENDING atau sudah APPROVED
-    // Kita izinkan pengajuan baru HANYA JIKA pengajuan sebelumnya sudah REJECTED
-    $exists = SponsorshipRequest::where('event_id', $data['event_id'])
-        ->where('sponsor_offer_id', $data['sponsor_offer_id'])
-        ->whereIn('status', ['pending', 'approved']) // Cari yang masih jalan atau sudah deal
-        ->exists();
+        // VALIDASI DUPLIKAT: Cek apakah sudah ada pending request untuk pasangan ini
+        $existingPending = SponsorshipRequest::where('event_id', $data['event_id'])
+            ->where('sponsor_offer_id', $data['sponsor_offer_id'])
+            ->where('status', 'pending')
+            ->exists();
 
-    if ($exists) {
-        return redirect()->route('explore.index')->with('error', 'Sudah ada pengajuan aktif atau kerjasama yang berjalan untuk kombinasi ini!');
-    }
+        if ($existingPending) {
+            $msg = 'Sudah ada pengajuan yang masih menunggu antara event dan program sponsor ini. Harap tunggu hingga pengajuan sebelumnya diproses.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 409);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
 
         $sponsorshipRequest = SponsorshipRequest::create($data);
 
@@ -100,7 +163,11 @@ class SponsorshipRequestController extends Controller
             $eventOrganizer->notify(new NewOfferApplicationNotification($sponsorshipRequest));
         }
 
-        return redirect()->route('explore.index')->with('success', 'Pengajuan berhasil dikirim! Menunggu konfirmasi pihak terkait.');
+        $message = 'Pengajuan berhasil dikirim! Menunggu konfirmasi pihak terkait.';
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $message]);
+        }
+        return redirect()->route('explore.index')->with('success', $message);
     }
 
     // ====================================================================

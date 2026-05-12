@@ -20,11 +20,24 @@ class Profile extends Model
         'company_sector',
         'instagram',
         'tiktok',
+        'profile_completed_at',
+    ];
+
+    protected $casts = [
+        'profile_completed_at' => 'datetime',
     ];
 
     // Relasi balik ke User
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Method untuk menandai profile sebagai selesai
+    public function markAsCompleted()
+    {
+        if (!$this->profile_completed_at) {
+            $this->update(['profile_completed_at' => now()]);
+        }
     }
 }

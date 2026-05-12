@@ -22,6 +22,11 @@ class AdminController extends Controller
         $totalOffers = SponsorOffer::count();
         $totalTransactions = SponsorshipRequest::count();
 
+        // Statistik verifikasi user
+        $usersVerified = User::whereIn('role', ['event', 'company'])->where('verification_status', 'verified')->count();
+        $usersRejected = User::whereIn('role', ['event', 'company'])->where('verification_status', 'rejected')->count();
+        $usersPending = User::whereIn('role', ['event', 'company'])->where('verification_status', 'pending')->count();
+
         $eventRequestsAccepted = SponsorshipRequest::where('initiator', 'event')->where('status', 'approved')->count();
         $eventRequestsPending = SponsorshipRequest::where('initiator', 'event')->where('status', 'pending')->count();
         $eventRequestsRejected = SponsorshipRequest::where('initiator', 'event')->where('status', 'rejected')->count();
@@ -50,6 +55,7 @@ class AdminController extends Controller
 
         return view('admin.dashboard', compact(
             'totalUsers', 'totalEvents', 'totalOffers', 'totalTransactions',
+            'usersVerified', 'usersRejected', 'usersPending',
             'eventRequestsAccepted', 'eventRequestsPending', 'eventRequestsRejected',
             'companyRequestsAccepted', 'companyRequestsPending', 'companyRequestsRejected',
             'eventStats', 'fundingStats',
@@ -67,8 +73,8 @@ class AdminController extends Controller
     public function verifications()
     {
         $pending = User::where('verification_status', 'pending')->with('profile')->latest()->get();
-        $approved = User::where('verification_status', 'verified')->with('profile')->latest()->take(10)->get();
-        $rejected = User::where('verification_status', 'rejected')->with('profile')->latest()->take(10)->get();
+        $approved = User::where('verification_status', 'verified')->with('profile')->orderBy('verified_at', 'desc')->take(10)->get();
+        $rejected = User::where('verification_status', 'rejected')->with('profile')->orderBy('updated_at', 'desc')->take(10)->get();
         
         return view('admin.verifications', compact('pending', 'approved', 'rejected'));
     }

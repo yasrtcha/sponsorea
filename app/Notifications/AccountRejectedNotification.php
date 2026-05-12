@@ -42,6 +42,8 @@ class AccountRejectedNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
+            'name' => 'Admin',
+            'action' => 'menolak akun Anda',
             'message' => 'Maaf, akun Anda ditolak. Alasan: ' . $this->reason,
             'url' => route('profile.edit'),
         ];

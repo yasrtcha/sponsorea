@@ -40,7 +40,9 @@ class NewSponsorshipRequestNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'message' => 'Proposal baru masuk dari ' . $this->sponsorshipRequest->event->user->name . ' untuk penawaran "' . $this->sponsorshipRequest->sponsorOffer->title . '".',
+            'name' => $this->sponsorshipRequest->event->user->name,
+            'action' => 'mengajukan proposal untuk',
+            'message' => 'Proposal baru masuk untuk penawaran "' . $this->sponsorshipRequest->sponsorOffer->title . '".',
             'url' => route('company.incoming_requests'),
         ];
     }

@@ -1,5 +1,5 @@
 <nav class="bg-white/95 backdrop-blur-sm shadow-sm fixed w-full z-50 border-b border-gray-100">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <a href="{{ route('landing') }}" class="text-xl font-bold text-indigo-600 tracking-tight">
             Sponsor<span class="text-indigo-400">ea</span>
         </a>

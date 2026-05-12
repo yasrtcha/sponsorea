@@ -12,13 +12,16 @@ class ProfileController extends Controller
     public function create()
     {
         $user = auth()->user();
+        
+        // Admin tidak perlu complete profile
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
 
         // Jika user ternyata sudah punya profil, jangan biarkan mereka isi form lagi.
-        // Langsung lempar ke dashboard masing-masing.
+        // Throw 403 exception sehingga browser back tidak bisa akses
         if ($user->hasCompletedProfile()) {
-            if ($user->isEvent()) return redirect()->route('event.dashboard');
-            if ($user->isCompany()) return redirect()->route('company.dashboard');
-            if ($user->isSuperAdmin()) return redirect()->route('admin.dashboard');
+            abort(403, 'Profil Anda sudah dilengkapi. Tidak bisa mengakses halaman ini lagi.');
         }
 
         return view('profile.complete');
@@ -37,7 +40,7 @@ class ProfileController extends Controller
         ]);
 
         // Simpan ke database menggunakan relasi yang sudah kita buat
-        Profile::create([
+        $profile = Profile::create([
             'user_id' => $user->id,
             'phone_number' => $request->phone_number,
             'address' => $request->address,
@@ -49,6 +52,9 @@ class ProfileController extends Controller
             'company_name' => $user->isCompany() ? $request->company_name : null,
             'company_sector' => $user->isCompany() ? $request->company_sector : null,
         ]);
+
+        // Tandai profile sebagai selesai
+        $profile->markAsCompleted();
 
         // Set verification_status to pending untuk non-admin users yang baru selesai profile
         if ($user->role !== 'admin') {
@@ -100,6 +106,9 @@ class ProfileController extends Controller
             'company_sector' => $user->isCompany() ? $request->company_sector : null,
         ]);
 
+        // Tandai profile sebagai selesai jika belum
+        $profile->markAsCompleted();
+
         return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
     }
 
@@ -121,16 +130,40 @@ class ProfileController extends Controller
     }
 
     // 4. Menampilkan profil user secara publik
-    public function show($userId)
+    public function show($userId, Request $request)
     {
-        $user = User::findOrFail($userId);
+        $user = User::with('profile')->findOrFail($userId);
         
-        // Jika user belum melengkapi profil, redirect ke explore
+        // Jika user belum melengkapi profil
         if (!$user->hasCompletedProfile()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Profil belum lengkap.'], 404);
+            }
             return redirect()->route('explore.index')->with('error', 'Profil pengguna belum lengkap.');
         }
 
         $profile = $user->profile;
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'display_name' => $user->isEvent() ? $profile->organization_name : $profile->company_name,
+                    'initial' => substr($user->isEvent() ? ($profile->organization_name ?? $user->name) : ($profile->company_name ?? $user->name), 0, 1),
+                    'sector' => $profile->company_sector ?? '-',
+                    'phone' => $profile->phone_number,
+                    'address' => $profile->address,
+                    'description' => $profile->description,
+                    'instagram' => $profile->instagram,
+                    'tiktok' => $profile->tiktok,
+                ]
+            ]);
+        }
+
         return view('profile.show', compact('user', 'profile'));
     }
 }

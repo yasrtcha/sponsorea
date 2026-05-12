@@ -40,6 +40,8 @@ class AccountApprovedNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
+            'name' => 'Admin',
+            'action' => 'menyetujui akun Anda',
             'message' => 'Selamat! Akun Anda telah disetujui oleh admin.',
             'url' => route('explore.index'),
         ];

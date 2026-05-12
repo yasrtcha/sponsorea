@@ -1,73 +1,84 @@
-@extends('layouts.dashboard') @section('title', 'Buat Event')
-@section('page_title', 'Event Saya')
+@extends('layouts.dashboard')
+
+@section('title', 'Buat Event Baru')
+@section('page_title', 'Buat Event Baru')
 
 @section('content')
-<div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-    <h2 class="text-2xl font-bold text-slate-800 mb-2">Upload Event & Proposal</h2>
-    <p class="text-slate-500 mb-6">Tambahkan event kepanitiaanmu agar bisa dilihat oleh calon sponsor.</p>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 xl:p-12 mb-10 w-full">
+    <div class="mb-8 pb-6 border-b border-gray-100">
+        <h2 class="text-2xl font-extrabold text-[#3d3d3d] mb-2">Informasi Event & Kegiatan</h2>
+        <p class="text-[13px] text-gray-500 font-medium">Isi detail event Anda di bawah ini dan unggah proposal untuk mulai menarik sponsor.</p>
+    </div>
     
     <form action="{{ route('event.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
         @csrf
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Event / Kegiatan</label>
+            <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Nama Event / Kegiatan</label>
             <input type="text" name="title" value="{{ old('title') }}" 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all" 
-                   placeholder="Contoh: Studi Banding FORMAPI UB goes to Yogyakarta" required>
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all" 
+                   placeholder="Contoh: Gebyar Seni & Budaya Nusantara 2026" required>
+            @error('title') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Kategori Event</label>
+                <select name="event_type" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all" required>
+                    <option value="" disabled selected>-- Pilih Kategori --</option>
+                    @foreach($eventTypes as $type)
+                        <option value="{{ $type->name }}" {{ old('event_type') == $type->name ? 'selected' : '' }}>
+                            {{ $type->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('event_type') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Tanggal Pelaksanaan</label>
+                <input type="date" name="event_date" value="{{ old('event_date') }}" 
+                       min="{{ now()->toDateString() }}"
+                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all" required>
+                @error('event_date') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+            </div>
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Kategori / Jenis Event</label>
-            <select name="event_type" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all" required>
-                <option value="" disabled selected>-- Pilih Jenis Event --</option>
-                @foreach($eventTypes as $type)
-                    <option value="{{ $type->name }}" {{ old('event_type') == $type->name ? 'selected' : '' }}>
-                        {{ $type->name }}
-                    </option>
-                @endforeach
-            </select>
-            @error('event_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-        </div>
-
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Pelaksanaan</label>
-            <input type="date" name="event_date" value="{{ old('event_date') }}" 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all" required>
-        </div>
-
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Singkat Event</label>
+            <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Deskripsi Singkat Event</label>
             <textarea name="description" rows="4" 
-                      class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all resize-none" 
-                      placeholder="Jelaskan secara singkat tujuan acara dan apa keuntungan bagi sponsor..." required>{{ old('description') }}</textarea>
+                      class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all resize-none" 
+                      placeholder="Jelaskan secara singkat tujuan acara, target audiens, dan keuntungan sponsor..." required>{{ old('description') }}</textarea>
+            @error('description') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Upload Poster Event (Opsional, Format .JPG/.PNG)</label>
+            <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Upload Poster Event (Opsional, Format .JPG/.PNG)</label>
             <input type="file" name="poster_image" accept="image/jpeg, image/png, image/jpg" 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-white text-[13px] font-medium text-[#3d3d3d] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-extrabold file:bg-[#fcf5f5] file:text-[#f07b32] hover:file:bg-[#f07b32] hover:file:text-white file:transition-all cursor-pointer">
+            @error('poster_image') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Upload Proposal (Format .PDF, Max 5MB)</label>
+            <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Upload Proposal (Wajib, Format .PDF, Max 5MB)</label>
             <div class="relative flex items-center justify-center w-full">
-                <label id="dropzone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+                <label id="dropzone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50/30 hover:bg-gray-50 transition-colors">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg class="w-8 h-8 mb-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                         
-                        <p id="file-name" class="mb-2 text-sm text-slate-500 text-center px-4 line-clamp-1">
-                            <span class="font-semibold">Klik untuk upload</span> atau drag and drop
+                        <p id="file-name" class="mb-2 text-[12px] text-gray-500 font-medium text-center px-4 line-clamp-1">
+                            <span class="font-extrabold text-[#f07b32]">Klik untuk upload</span> proposal kegiatan
                         </p>
                     </div>
                     
                     <input id="file-input" type="file" name="proposal_pdf" accept="application/pdf" class="hidden" required />
                 </label>
             </div>
-            @error('proposal_pdf') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            @error('proposal_pdf') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
         </div>
 
-        <div class="pt-4 flex gap-4">
-            <button type="submit" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-700 hover:shadow-lg transition-all">
+        <div class="pt-6 flex gap-4">
+            <a href="{{ route('event.index') }}" class="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-extrabold text-sm hover:bg-gray-50 hover:text-[#3d3d3d] transition-all flex items-center justify-center">Batal</a>
+            <button type="submit" class="flex-1 bg-[#f07b32] text-white font-extrabold py-3 px-4 rounded-xl hover:bg-[#d96a25] shadow-lg shadow-[#f07b32]/20 transition-all text-sm">
                 Simpan & Upload Proposal
             </button>
         </div>
@@ -75,34 +86,59 @@
 </div>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('file-input');
-            const fileNameDisplay = document.getElementById('file-name');
-            const dropzone = document.getElementById('dropzone');
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name');
+    const dropzone = document.getElementById('dropzone');
 
-            fileInput.addEventListener('change', function() {
-                // Cek apakah ada file yang dipilih
-                if (this.files && this.files.length > 0) {
-                    const file = this.files[0];
-                    const fileSize = (file.size / 1024 / 1024).toFixed(2); // Ubah ke MB
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
 
-                    // Ganti teks dengan nama file dan ukurannya
-                    fileNameDisplay.innerHTML = `
-                        <span class="font-semibold text-indigo-700">${file.name}</span> 
-                        <br> <span class="text-xs text-indigo-500">Ukuran: ${fileSize} MB</span>
-                    `;
-                    
-                    // Ubah border dan background dropzone biar kelihatan sukses terpilih
-                    dropzone.classList.remove('border-slate-300', 'bg-slate-50', 'hover:bg-slate-100');
-                    dropzone.classList.add('border-indigo-500', 'bg-indigo-50', 'hover:bg-indigo-100');
-                } else {
-                    // Kalau user batal milih file, kembalikan ke tampilan awal
-                    fileNameDisplay.innerHTML = `<span class="font-semibold">Klik untuk upload</span> atau drag and drop`;
-                    dropzone.classList.remove('border-indigo-500', 'bg-indigo-50', 'hover:bg-indigo-100');
-                    dropzone.classList.add('border-slate-300', 'bg-slate-50', 'hover:bg-slate-100');
-                }
-            });
-        });
-    </script>
+            if (fileSize > 5) {
+                fileNameDisplay.innerHTML = `<span class="font-extrabold text-red-500">File terlalu besar!</span> <br> <span class="text-[11px] font-bold text-red-400">Maksimal 5MB</span>`;
+                dropzone.classList.remove('border-gray-300', 'bg-gray-50/30', 'hover:bg-gray-50', 'border-[#f07b32]', 'bg-[#fcf5f5]');
+                dropzone.classList.add('border-red-500', 'bg-red-50', 'hover:bg-red-100/50');
+                this.value = '';
+                return;
+            }
 
+            fileNameDisplay.innerHTML = `
+                <span class="font-extrabold text-[#3d3d3d]">${file.name}</span> 
+                <br> <span class="text-[11px] font-bold text-[#f07b32]">Ukuran: ${fileSize} MB</span>
+            `;
+            
+            dropzone.classList.remove('border-gray-300', 'bg-gray-50/30', 'hover:bg-gray-50', 'border-red-500', 'bg-red-50');
+            dropzone.classList.add('border-[#f07b32]', 'bg-[#fcf5f5]', 'hover:bg-[#f07b32]/5');
+        } else {
+            fileNameDisplay.innerHTML = `<span class="font-extrabold text-[#f07b32]">Klik untuk upload</span> proposal kegiatan`;
+            dropzone.classList.remove('border-[#f07b32]', 'bg-[#fcf5f5]', 'hover:bg-[#f07b32]/5', 'border-red-500', 'bg-red-50');
+            dropzone.classList.add('border-gray-300', 'bg-gray-50/30', 'hover:bg-gray-50');
+        }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.add('bg-gray-50/50'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.remove('bg-gray-50/50'), false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }, false);
+});
+</script>
 @endsection

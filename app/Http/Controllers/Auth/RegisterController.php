@@ -11,6 +11,26 @@ class RegisterController extends Controller
 {
     public function show()
     {
+        // Jika user sudah authenticated, check profile completion status
+        if (auth()->check()) {
+            $user = auth()->user();
+            
+            // Admin tidak perlu complete profile, langsung ke dashboard
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            
+            // Jika belum complete profile (untuk event/company), redirect ke profile.complete
+            if (!$user->hasCompletedProfile()) {
+                return redirect()->route('profile.complete');
+            }
+            
+            // Jika sudah complete profile, redirect ke dashboard mereka
+            if ($user->role === 'event') return redirect()->route('event.dashboard');
+            if ($user->role === 'company') return redirect()->route('company.dashboard');
+            return redirect()->route('explore.index');
+        }
+        
         return view('auth.register');
     }
 

@@ -1,453 +1,726 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eksplorasi - Sponsorea</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-800">
+@extends('layouts.dashboard')
 
-    @include('components.navbar-app')
+@section('title', 'Jelajahi')
+@section('page_title', 'Jelajahi Peluang')
 
-<div x-data="{ activeTab: '{{ auth()->user()->role === 'company' ? 'events' : 'offers' }}' }" class="min-h-screen">
-    <!-- Hero Section -->
-    <div class="relative pt-16 pb-12">
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 opacity-30 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-20 -left-40 w-72 h-72 bg-teal-100 opacity-20 rounded-full blur-3xl"></div>
+@section('content')
+<div x-data="exploreComponent()" class="pb-16 space-y-6">
+        
+        <!-- Premium Hero Section (Card Formatted) -->
+        <div class="relative bg-[#3d3d3d] pt-10 pb-16 overflow-hidden rounded-[2rem] border border-[#f07b32]/20 shadow-md">
+            <!-- Grid Pattern Background -->
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+            
+            <!-- Glow accents -->
+            <div class="absolute top-0 right-1/4 w-80 h-80 bg-[#f07b32]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-1/4 w-60 h-60 bg-gray-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative w-full mx-auto px-6 lg:px-10 text-center z-10">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+                    Peluang Kolaborasi <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#f07b32] to-[#ffb07a]">Terbaik</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto mb-8 font-medium">
+                    Temukan event yang merepresentasikan nilai perusahaan, atau pendanaan luar biasa untuk mendukung inovasi acara Anda.
+                </p>
+                
+                <div class="max-w-2xl mx-auto relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-[#f07b32] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input id="q" name="q" type="search" value="{{ old('q', $query ?? '') }}" 
+                           class="block w-full pl-11 pr-4 py-3.5 text-sm rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-gray-400 focus:bg-white focus:text-[#3d3d3d] focus:border-[#f07b32] focus:ring-4 focus:ring-[#f07b32]/30 transition-all shadow-xl backdrop-blur-md outline-none" 
+                           placeholder="Coba ketik 'Festival' atau 'Beasiswa'..." autofocus>
+                </div>
+            </div>
         </div>
 
-        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <h1 class="text-4xl sm:text-5xl font-black text-slate-900 mb-3">Jelajahi Peluang</h1>
-            <p class="text-slate-500 text-lg mb-8">Temukan event atau sponsor yang sempurna untuk kolaborasi Anda</p>
-            
-            <!-- Search Input with Icon -->
-            <div class="relative max-w-2xl mx-auto">
-                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
+        <main class="relative z-20">
+
+            <!-- Notifications -->
+            @if(session('error'))
+                <div class="mb-4 bg-red-50 border border-red-200 p-4 rounded-2xl shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-[13px] text-red-700 font-bold">{{ session('error') }}</p>
+                    </div>
+                    @if(auth()->user()->role === 'event')
+                        <a href="{{ route('event.index') }}" class="text-[13px] font-extrabold text-red-700 hover:text-red-800 underline">Buat Event</a>
+                    @else
+                        <a href="{{ route('company.index') }}" class="text-[13px] font-extrabold text-red-700 hover:text-red-800 underline">Buat Penawaran</a>
+                    @endif
                 </div>
-                <input id="q" name="q" type="search" value="{{ old('q', $query ?? '') }}" placeholder="Cari event, penawaran, atau organisasi..." class="w-full pl-12 pr-5 py-3.5 rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400 transition-all duration-200" autofocus />
+            @endif
+
+            @if(session('success'))
+                <div class="mb-4 bg-[#f0f9f8] border border-teal-200 p-4 rounded-2xl shadow-sm">
+                    <p class="text-[13px] text-teal-700 font-bold">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            <!-- Control Bar (Tabs & Filters) -->
+            <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 p-2 flex flex-col md:flex-row justify-between items-center gap-3 mb-6">
+                
+                <!-- Pill Tabs -->
+                <div class="flex p-1 bg-[#f5f4f0] rounded-xl w-full md:w-auto">
+                    @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                        <button @click="activeTab = 'offers'" 
+                                :class="activeTab === 'offers' ? 'bg-white text-[#f07b32] shadow-sm rounded-lg font-bold' : 'text-gray-500 hover:text-[#3d3d3d] font-semibold'"
+                                class="flex-1 justify-center md:flex-none flex items-center px-5 py-2.5 text-[13px] transition-all duration-200">
+                            Program Sponsorship
+                        </button>
+                    @endif
+                    
+                    @if(auth()->user()->role === 'company' || auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                        <button @click="activeTab = 'events'" 
+                                :class="activeTab === 'events' ? 'bg-white text-[#f07b32] shadow-sm rounded-lg font-bold' : 'text-gray-500 hover:text-[#3d3d3d] font-semibold'"
+                                class="flex-1 justify-center md:flex-none flex items-center px-5 py-2.5 text-[13px] transition-all duration-200">
+                            Katalog Event
+                        </button>
+                    @endif
+                </div>
+
+                <!-- Filters -->
+                <div class="flex items-center space-x-2 w-full md:w-auto px-2 pb-2 md:pb-0">
+                    @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                        <div x-show="activeTab === 'offers'" x-cloak class="relative flex-grow md:flex-grow-0 min-w-[180px]">
+                            <select id="fundingTypeFilter" class="appearance-none block w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-100 text-[13px] font-bold rounded-xl focus:ring-2 focus:ring-[#f07b32] focus:border-[#f07b32] text-[#3d3d3d] outline-none transition-all hover:bg-gray-100 cursor-pointer">
+                                <option value="">Semua Sponsorship</option>
+                                @foreach($fundingTypes as $type)
+                                    <option value="{{ $type->name }}" {{ $fundingType === $type->name ? 'selected' : '' }}>{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(auth()->user()->role === 'company' || auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                        <div x-show="activeTab === 'events'" x-cloak class="relative flex-grow md:flex-grow-0 min-w-[180px]">
+                            <select id="eventTypeFilter" class="appearance-none block w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-100 text-[13px] font-bold rounded-xl focus:ring-2 focus:ring-[#f07b32] focus:border-[#f07b32] text-[#3d3d3d] outline-none transition-all hover:bg-gray-100 cursor-pointer">
+                                <option value="">Semua Jenis Event</option>
+                                @foreach($eventTypes as $type)
+                                    <option value="{{ $type->name }}" {{ $eventType === $type->name ? 'selected' : '' }}>{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    @endif
+
+                    <button onclick="applyFilters()" class="inline-flex items-center justify-center p-2.5 border border-gray-200 rounded-xl shadow-sm text-gray-600 bg-white hover:bg-gray-50 hover:text-[#f07b32] focus:outline-none transition-colors" title="Terapkan Filter">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    </button>
+                    
+                    @if($eventType || $fundingType)
+                        <a href="{{ route('explore.index') }}" class="text-[13px] text-red-500 hover:text-red-700 font-bold whitespace-nowrap transition-colors pl-1">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="exploreContent">
+                
+                <!-- OFFERS TAB -->
+                @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                <div x-show="activeTab === 'offers'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
+                    @if($offers->count() > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            @foreach($offers as $offer)
+                            <div class="bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:border-[#f07b32]/30 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group z-0 relative">
+                                
+                                <div class="relative h-40 bg-gray-100 overflow-hidden">
+                                    @if($offer->banner_image)
+                                        <img src="{{ asset('storage/' . $offer->banner_image) }}" alt="Banner" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                                    @else
+                                        <div class="flex items-center justify-center h-full text-gray-300 bg-gray-100/50">
+                                            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    @endif
+                                    
+
+                                </div>
+                                
+                                <div class="p-5 flex flex-col flex-grow relative bg-white z-20">
+                                    <!-- Avatar Floating (Button trigger modal) -->
+                                    <button @click="openProfileModal({{ $offer->user->id }})" class="absolute -top-6 right-5 border-4 border-white rounded-xl w-12 h-12 flex items-center justify-center text-lg shadow-sm transition-transform hover:scale-110 hover:shadow-md focus:outline-none z-30 font-extrabold bg-[#fcf5f5] text-[#f07b32]" title="Lihat Profil">
+                                         {{ substr($offer->user->profile->company_name ?? $offer->user->name ?? 'C', 0, 1) }}
+                                    </button>
+
+                                    <button @click="openProfileModal({{ $offer->user->id }})" class="text-left inline-block mt-1 mb-1.5 text-[10px] font-bold text-[#f07b32] uppercase tracking-wider pr-10 truncate hover:text-[#d96a25] transition-colors">
+                                        {{ $offer->user->profile->company_name ?? $offer->user->name ?? 'Perusahaan' }}
+                                    </button>
+                                    
+                                    <h3 class="text-sm font-extrabold text-[#3d3d3d] mb-1.5 line-clamp-2 leading-tight group-hover:text-[#f07b32] transition-colors">
+                                        {{ $offer->title }}
+                                    </h3>
+
+                                    <div class="mb-2.5">
+                                        <span class="inline-flex items-center px-2 py-1 rounded bg-[#f5f4f0] text-gray-600 text-[9px] font-extrabold uppercase tracking-wider border border-gray-200">
+                                            {{ $offer->funding_type }}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Description -->
+                                    <div x-data="{ expanded: false }" class="mb-5 flex-grow">
+                                        <p :class="expanded ? '' : 'line-clamp-2'" class="text-xs text-gray-500 break-words leading-relaxed">
+                                            {{ $offer->description }}
+                                        </p>
+                                        @if(strlen($offer->description) > 80)
+                                            <button @click="expanded = !expanded" class="text-[#f07b32] text-[10px] font-bold mt-1.5 hover:text-[#d96a25] transition-colors focus:outline-none inline-flex items-center">
+                                                <span x-text="expanded ? 'Sembunyikan' : 'Baca Selengkapnya'"></span>
+                                                <svg x-show="!expanded" class="ml-1 w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                <svg x-show="expanded" style="display:none;" class="ml-1 w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
+                                        @if($offer->guideline_pdf)
+                                            <a href="{{ asset('storage/' . $offer->guideline_pdf) }}" target="_blank" class="w-full inline-flex justify-center items-center px-2 py-2 border border-gray-200 shadow-sm text-[11px] font-bold rounded-xl text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all focus:outline-none">
+                                                Dokumen
+                                            </a>
+                                        @else
+                                            <span class="w-full inline-flex justify-center items-center px-2 py-2 border border-gray-100 text-[11px] font-bold rounded-xl text-gray-400 bg-[#f5f4f0] cursor-not-allowed">
+                                                Kosong
+                                            </span>
+                                        @endif
+                                        
+                                        @if(auth()->user()->role !== 'admin')
+                                            @if($pendingOfferIds->contains($offer->id))
+                                                <span class="w-full inline-flex justify-center items-center gap-1.5 px-2 py-2 border border-amber-200 text-[11px] font-extrabold rounded-xl text-amber-700 bg-amber-50 cursor-not-allowed">
+                                                    <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    Menunggu
+                                                </span>
+                                            @else
+                                                <button onclick="openRequestModal('offer', {{ $offer->id }}, '{{ addslashes($offer->title) }}')" class="w-full inline-flex justify-center items-center px-2 py-2 border border-transparent shadow-sm text-[11px] font-extrabold rounded-xl text-white bg-[#f07b32] hover:bg-[#d96a25] transition-all focus:outline-none">
+                                                    Ajukan
+                                                </button>
+                                            @endif
+                                        @else
+                                            <span class="w-full inline-flex justify-center items-center px-2 py-2 border border-transparent text-[11px] font-extrabold rounded-xl text-[#3d3d3d]/50 bg-[#3d3d3d]/10 cursor-not-allowed">
+                                                Ajukan
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-20 bg-white rounded-[2rem] border-dashed border-2 border-gray-200 shadow-sm mx-auto max-w-xl">
+                            <div class="mx-auto w-16 h-16 bg-[#f5f4f0] rounded-full flex items-center justify-center mb-4">
+                                <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
+                            <h3 class="text-base font-extrabold text-[#3d3d3d]">Belum ada penawaran tersedia</h3>
+                            <p class="mt-2 text-xs text-gray-500 font-medium">Cek kembali halaman ini dalam beberapa waktu ke depan untuk info sponsorship.</p>
+                        </div>
+                    @endif
+                </div>
+                @endif
+
+                <!-- EVENTS TAB -->
+                @if(auth()->user()->role === 'company' || auth()->user()->role === 'event' || auth()->user()->role === 'admin')
+                <div x-show="activeTab === 'events'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
+                    @if($events->count() > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            @foreach($events as $event)
+                            <div class="bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:border-[#f07b32]/30 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group z-0 relative">
+                                
+                                <div class="relative h-40 bg-gray-100 overflow-hidden">
+                                    @if($event->poster_image)
+                                        <img src="{{ asset('storage/' . $event->poster_image) }}" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                                    @else
+                                        <div class="flex items-center justify-center h-full text-gray-300 bg-gray-100/50">
+                                            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="absolute top-3 left-3 z-20">
+                                        <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-[#3d3d3d]/90 text-white text-[10px] font-extrabold tracking-wider shadow-sm backdrop-blur-sm">
+                                            <svg class="w-3 h-3 mr-1 text-[#f07b32]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }}
+                                        </span>
+                                    </div>
+                                    
+
+                                </div>
+                                
+                                <div class="p-5 flex flex-col flex-grow relative bg-white z-20">
+                                    <!-- Avatar Floating (Button trigger modal) -->
+                                    <button @click="openProfileModal({{ $event->user->id }})" class="absolute -top-6 right-5 border-4 border-white rounded-xl w-12 h-12 flex items-center justify-center text-lg shadow-sm transition-transform hover:scale-110 hover:shadow-md focus:outline-none z-30 font-extrabold bg-[#f5f4f0] text-[#3d3d3d]" title="Lihat Profil">
+                                         {{ substr($event->user->profile->organization_name ?? $event->user->name ?? 'O', 0, 1) }}
+                                    </button>
+
+                                    <button @click="openProfileModal({{ $event->user->id }})" class="text-left inline-block mt-1 mb-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-widest pr-10 truncate hover:text-[#3d3d3d] transition-colors">
+                                        {{ $event->user->profile->organization_name ?? $event->user->name ?? 'Organisasi' }}
+                                    </button>
+                                    
+                                    <h3 class="text-sm font-extrabold text-[#3d3d3d] mb-1.5 line-clamp-2 leading-tight group-hover:text-[#f07b32] transition-colors">
+                                        {{ $event->title }}
+                                    </h3>
+
+                                    <div class="mb-2.5">
+                                        <span class="inline-flex px-2 py-1 rounded bg-[#f5f4f0] text-gray-600 text-[9px] font-extrabold uppercase tracking-wider border border-gray-200">
+                                            {{ $event->event_type }}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Description -->
+                                    <div x-data="{ expanded: false }" class="mb-5 flex-grow">
+                                        <p :class="expanded ? '' : 'line-clamp-2'" class="text-xs text-gray-500 break-words leading-relaxed">
+                                            {{ $event->description }}
+                                        </p>
+                                        @if(strlen($event->description) > 80)
+                                            <button @click="expanded = !expanded" class="text-[#f07b32] text-[10px] font-bold mt-1.5 hover:text-[#d96a25] transition-colors focus:outline-none inline-flex items-center">
+                                                <span x-text="expanded ? 'Sembunyikan' : 'Baca Selengkapnya'"></span>
+                                                <svg x-show="!expanded" class="ml-1 w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                <svg x-show="expanded" style="display:none;" class="ml-1 w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
+                                        @if($event->proposal_pdf)
+                                            <a href="{{ asset('storage/' . $event->proposal_pdf) }}" target="_blank" class="w-full inline-flex justify-center items-center px-2 py-2 border border-gray-200 shadow-sm text-[11px] font-bold rounded-xl text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all focus:outline-none">
+                                                Proposal
+                                            </a>
+                                        @else
+                                            <span class="w-full inline-flex justify-center items-center px-2 py-2 border border-gray-100 text-[11px] font-bold rounded-xl text-gray-400 bg-[#f5f4f0] cursor-not-allowed">
+                                                Kosong
+                                            </span>
+                                        @endif
+                                        
+                                        @if(auth()->user()->role === 'company')
+                                            @if($pendingEventIds->contains($event->id))
+                                                <span class="w-full inline-flex justify-center items-center gap-1.5 px-2 py-2 border border-amber-200 text-[11px] font-extrabold rounded-xl text-amber-700 bg-amber-50 cursor-not-allowed">
+                                                    <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    Tunggu
+                                                </span>
+                                            @else
+                                                <button onclick="openRequestModal('event', {{ $event->id }}, '{{ addslashes($event->title) }}')" class="w-full inline-flex justify-center items-center px-2 py-2 border border-transparent shadow-sm text-[11px] font-extrabold rounded-xl text-white bg-[#3d3d3d] hover:bg-black transition-all focus:outline-none group/btn">
+                                                    <svg class="mr-1.5 h-3.5 w-3.5 text-gray-400 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                                    Sponsori
+                                                </button>
+                                            @endif
+                                        @else
+                                            <span class="w-full inline-flex justify-center items-center px-2 py-2 border border-transparent text-[11px] font-extrabold rounded-xl text-gray-400 bg-gray-200 cursor-not-allowed hidden">
+                                                Sponsori
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-20 bg-white rounded-[2rem] border-dashed border-2 border-gray-200 shadow-sm mx-auto max-w-xl">
+                            <div class="mx-auto w-16 h-16 bg-[#f5f4f0] rounded-full flex items-center justify-center mb-4">
+                                <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="text-base font-extrabold text-[#3d3d3d]">Belum ada event terbuka</h3>
+                            <p class="mt-2 text-xs text-gray-500 font-medium">Event yang mencari sponsor akan mendisplay ide mereka di sini.</p>
+                        </div>
+                    @endif
+                </div>
+                @endif
+                
+            </div>
+        </main>
+
+        <!-- Profile Modal -->
+        <div x-cloak x-show="profileModalOpen" class="relative z-50" aria-labelledby="profile-modal" role="dialog" aria-modal="true">
+            <div x-show="profileModalOpen" x-transition.opacity class="fixed inset-0 bg-[#3d3d3d]/50 backdrop-blur-sm transition-opacity"></div>
+            
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <!-- Loading State -->
+                    <template x-if="loadingProfile">
+                        <div class="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center shadow-2xl">
+                            <svg class="animate-spin h-8 w-8 text-[#f07b32] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-sm font-bold text-gray-500">Memuat profil...</p>
+                        </div>
+                    </template>
+
+                    <!-- Profile Content -->
+                    <template x-if="selectedProfile">
+                        <div @click.away="profileModalOpen = false" x-show="profileModalOpen" x-transition.scale.origin.bottom class="relative transform overflow-visible rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-2xl">
+                            
+                            <!-- Header Background -->
+                            <div class="h-28 bg-gradient-to-r from-[#f0f9f8] to-[#f5f4f0] relative rounded-t-3xl">
+                                <button @click="profileModalOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-[#3d3d3d] transition-colors p-1.5 bg-white/50 backdrop-blur-sm rounded-full shadow-sm z-50">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Konten Profil -->
+                            <div class="px-8 pb-8">
+                                <!-- Avatar & Info Dasar -->
+                                <div class="flex flex-col sm:flex-row gap-5 -mt-14 mb-6 items-start sm:items-center relative z-10">
+                                    <div class="w-28 h-28 rounded-2xl bg-white border-[4px] border-white shadow-lg flex items-center justify-center text-5xl font-black shrink-0" :class="selectedProfile.role === 'company' ? 'bg-[#fcf5f5] text-[#f07b32]' : 'bg-[#f5f4f0] text-[#3d3d3d]'">
+                                        <span x-text="selectedProfile.initial"></span>
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0 pt-6">
+                                        <h1 class="text-2xl font-extrabold text-[#3d3d3d] truncate leading-tight" x-text="selectedProfile.display_name"></h1>
+                                        <p class="text-sm text-gray-500 font-medium mt-1 truncate" x-text="selectedProfile.name"></p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-2 flex-wrap mb-6">
+                                    <span class="px-2.5 py-1 rounded bg-gray-100 text-gray-500 text-[9px] font-extrabold uppercase tracking-wider border border-gray-200" x-text="selectedProfile.role">
+                                    </span>
+                                    <template x-if="selectedProfile.role === 'company' && selectedProfile.sector !== '-'">
+                                        <span class="px-2.5 py-1 rounded bg-[#fcf5f5] text-[#f07b32] text-[9px] font-extrabold uppercase tracking-wider border border-[#f07b32]/20" x-text="selectedProfile.sector">
+                                        </span>
+                                    </template>
+                                </div>
+
+                                <!-- Info Grid -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <!-- Email -->
+                                    <div>
+                                        <p class="text-gray-400 font-bold text-[10px] uppercase tracking-wider mb-0.5">Email</p>
+                                        <p class="text-[13px] font-semibold text-[#3d3d3d] truncate" x-text="selectedProfile.email"></p>
+                                    </div>
+
+                                    <!-- Telepon -->
+                                    <template x-if="selectedProfile.phone">
+                                        <div>
+                                            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-wider mb-0.5">Telepon</p>
+                                            <p class="text-[13px] font-semibold text-[#3d3d3d]" x-text="selectedProfile.phone"></p>
+                                        </div>
+                                    </template>
+
+                                    <!-- Alamat -->
+                                    <template x-if="selectedProfile.address">
+                                        <div class="md:col-span-2">
+                                            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-wider mb-0.5">Alamat</p>
+                                            <p class="text-[13px] font-semibold text-[#3d3d3d] leading-relaxed" x-text="selectedProfile.address"></p>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Sosmed -->
+                                <div class="flex gap-4 mb-6">
+                                    <template x-if="selectedProfile.instagram">
+                                        <a :href="`https://instagram.com/${selectedProfile.instagram}`" target="_blank" class="text-[11px] font-extrabold text-[#f07b32] hover:text-[#d96a25] flex items-center gap-1 bg-[#f5f4f0] px-3 py-1.5 rounded-lg">📸 @<span x-text="selectedProfile.instagram"></span></a>
+                                    </template>
+                                    <template x-if="selectedProfile.tiktok">
+                                        <a :href="`https://tiktok.com/@${selectedProfile.tiktok}`" target="_blank" class="text-[11px] font-extrabold text-[#3d3d3d] hover:text-black flex items-center gap-1 bg-[#f5f4f0] px-3 py-1.5 rounded-lg">🎵 @<span x-text="selectedProfile.tiktok"></span></a>
+                                    </template>
+                                </div>
+
+                                <!-- Deskripsi -->
+                                <div>
+                                    <h2 class="text-gray-400 font-bold text-[10px] uppercase tracking-wider pb-1 mb-2" x-text="selectedProfile.role === 'company' ? 'TENTANG PERUSAHAAN' : 'TENTANG ORGANISASI'"></h2>
+                                    <p class="text-[13px] text-gray-600 leading-relaxed max-h-40 overflow-y-auto pr-2 custom-scrollbar" x-text="selectedProfile.description"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Error & Success Messages -->
-        @if(session('error'))
-            <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <p class="text-sm font-bold">{{ session('error') }}</p>
+    <!-- Request Modal -->
+    <div id="requestModal" class="hidden fixed inset-0 bg-[#3d3d3d]/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between z-10">
+                <div>
+                    <h3 id="requestModalTitle" class="text-lg font-extrabold text-[#3d3d3d]">Ajukan Pengajuan</h3>
+                    <p class="text-[11px] text-gray-500 font-medium mt-1">Target: <span id="requestModalTarget" class="font-extrabold text-[#f07b32]"></span></p>
                 </div>
-                @if(auth()->user()->role === 'event')
-                    <a href="{{ route('event.index') }}" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-xs font-bold transition-colors shrink-0">
-                        Buat Event
-                    </a>
-                @else
-                    <a href="{{ route('company.index') }}" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-xs font-bold transition-colors shrink-0">
-                        Buat Penawaran
-                    </a>
-                @endif
+                <button onclick="closeRequestModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1 bg-gray-50 rounded-full">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-        @endif
-        @if(session('success'))
-            <div class="mb-6 p-4 rounded-xl bg-teal-50 text-teal-700 font-semibold border border-teal-100 flex items-center gap-3">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                {{ session('success') }}
-            </div>
-        @endif
 
-        <!-- Tab Navigation -->
-        <div class="mb-8 flex flex-wrap gap-3 justify-center">
-            @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                <button 
-                    @click="activeTab = 'offers'" 
-                    :class="activeTab === 'offers' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'"
-                    class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200"
-                >
-                    Cari Sponsor
-                </button>
-            @endif
-            
-            @if(auth()->user()->role === 'company')
-                <button 
-                    @click="activeTab = 'events'" 
-                    :class="activeTab === 'events' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'"
-                    class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200"
-                >
-                    Cari Event
-                </button>
-            @elseif(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                <button 
-                    @click="activeTab = 'events'" 
-                    :class="activeTab === 'events' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'"
-                    class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200"
-                >
-                    Lihat Event Lainnya
-                </button>
-            @endif
-        </div>
+            <!-- Form -->
+            <div class="p-6">
+                <form id="requestForm" class="space-y-5">
+                    <input type="hidden" id="requestType" name="target_type">
+                    <input type="hidden" id="requestTargetId" name="target_id">
 
-        <!-- Filter Section -->
-        <div class="mb-8 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div class="flex flex-wrap gap-4 items-end">
-                @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                    <div class="flex-1 min-w-64">
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Filter Jenis Pendanaan</label>
-                        <select id="fundingTypeFilter" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                            <option value="">-- Semua Jenis Pendanaan --</option>
-                            @foreach($fundingTypes as $type)
-                                <option value="{{ $type->name }}" {{ $fundingType === $type->name ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
+                    <div>
+                        <label class="block text-[13px] font-extrabold text-[#3d3d3d] mb-2">
+                            Pilih Aset Kamu
+                        </label>
+                        <select id="requestAssetId" name="my_asset_id" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32] focus:border-[#f07b32] focus:outline-none transition-all bg-white text-sm font-semibold text-[#3d3d3d]" required>
+                            <option value="" disabled selected>-- Silakan Pilih --</option>
                         </select>
+                        <p class="text-[10px] text-gray-500 font-medium mt-2">Dokumen dari aset yang dipilih akan otomatis diteruskan.</p>
                     </div>
-                @endif
 
-                @if(auth()->user()->role === 'company' || auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                    <div class="flex-1 min-w-64">
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Filter Jenis Event</label>
-                        <select id="eventTypeFilter" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                            <option value="">-- Semua Jenis Event --</option>
-                            @foreach($eventTypes as $type)
-                                <option value="{{ $type->name }}" {{ $eventType === $type->name ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <label class="block text-[13px] font-extrabold text-[#3d3d3d] mb-2">Pesan Pengantar</label>
+                        <textarea id="requestMessage" name="message" rows="4" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32] focus:border-[#f07b32] focus:outline-none transition-all resize-none text-sm font-semibold" placeholder="Halo, ini sangat cocok dengan brand Anda..." required></textarea>
                     </div>
-                @endif
 
-                <button type="button" onclick="applyFilters()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
-                    Terapkan Filter
-                </button>
-
-                @if($eventType || $fundingType)
-                    <a href="{{ route('explore.index') }}" class="bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
-                        Reset Filter
-                    </a>
-                @endif
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeRequestModal()" class="flex-1 px-4 py-3.5 border border-gray-200 rounded-[1rem] text-[13px] font-extrabold text-[#3d3d3d] hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-3.5 bg-[#f07b32] text-white rounded-[1rem] text-[13px] font-extrabold hover:bg-[#d96a25] transition-colors shadow-sm">
+                            Kirim Sekarang
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div id="exploreContent">
-            <!-- PROGRAM SPONSORSHIP TAB -->
-            @if(auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                <section x-show="activeTab === 'offers'" x-transition class="space-y-8">
-                    @if($offers->count() > 0)
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-900 mb-2">Program Sponsorship Tersedia</h2>
-                            <p class="text-slate-500 text-sm">{{ $offers->count() }} peluang sponsor menanti Anda</p>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-                            @foreach($offers as $offer)
-                                <div class="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-indigo-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                                    
-                                    <!-- Image Section with Badge -->
-                                    <div class="relative h-44 overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50">
-                                        @if($offer->banner_image)
-                                            <img src="{{ asset('storage/' . $offer->banner_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                        @else
-                                            <div class="flex items-center justify-center h-full">
-                                                <div class="text-center">
-                                                    <svg class="w-12 h-12 text-indigo-200 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                    <p class="text-indigo-300 text-xs font-semibold">Sponsor Banner</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <!-- Badge -->
-                                        <div class="absolute top-3 right-3">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M8.5 7c1.657 0 3-1.343 3-3S10.157 1 8.5 1 5.5 2.343 5.5 4 6.843 7 8.5 7zm0 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm6.5-11C11.12.5 9.5 2.12 9.5 4S11.12 7.5 13 7.5 16.5 5.88 16.5 4 14.88-10.5 13-10.5z"></path></svg>
-                                                {{ $offer->funding_type }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Content Section -->
-                                    <div class="p-6 flex flex-col flex-1">
-                                        <!-- Organizer -->
-                                        <a href="{{ route('user.profile.show', $offer->user->id) }}" class="flex items-center gap-3 mb-4 group/user">
-                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-700 flex items-center justify-center font-bold border-2 border-indigo-200 group-hover/user:border-indigo-400 transition-colors">
-                                                {{ substr($offer->user->profile->company_name ?? $offer->user->name ?? 'C', 0, 1) }}
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-slate-900 group-hover/user:text-indigo-600 transition-colors">{{ $offer->user->profile->company_name ?? $offer->user->name ?? 'Company' }}</p>
-                                                <p class="text-xs text-slate-400 font-medium">{{ $offer->created_at->diffForHumans() }}</p>
-                                            </div>
-                                        </a>
-
-                                        <!-- Title -->
-                                        <h3 class="text-lg font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ $offer->title }}</h3>
-
-                                        <!-- Description -->
-                                        <div x-data="{ expanded: false }" class="mb-5 flex-1">
-                                            <p :class="expanded ? '' : 'line-clamp-2'" class="text-slate-600 text-sm leading-relaxed transition-all duration-300">
-                                                {{ $offer->description }}
-                                            </p>
-                                            @if(strlen($offer->description) > 80)
-                                                <button @click="expanded = !expanded" class="text-indigo-600 text-xs font-semibold mt-2 hover:text-indigo-700 focus:outline-none">
-                                                    <span x-text="expanded ? '▲ Sembunyikan' : '▼ Baca Lebih'"></span>
-                                                </button>
-                                            @endif
-                                        </div>
-
-                                        <!-- Divider -->
-                                        <div class="border-t border-slate-100 pt-4 mt-auto flex gap-2">
-                                            @if($offer->guideline_pdf)
-                                                <a href="{{ asset('storage/' . $offer->guideline_pdf) }}" target="_blank" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-lg text-xs text-center transition-colors">
-                                                    Guideline
-                                                </a>
-                                            @endif
-                                            @if(auth()->user()->role !== 'admin')
-                                                <a href="{{ route('request.create', ['type' => 'offer', 'id' => $offer->id]) }}" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-xs text-center transition-all hover:shadow-lg hover:-translate-y-0.5">
-                                                    Ajukan
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <!-- Empty State -->
-                        <div class="py-16 px-6 text-center">
-                            <div class="inline-block mb-4">
-                                <svg class="w-16 h-16 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2">Belum ada penawaran sponsor</h3>
-                            <p class="text-slate-500 text-sm mb-6">Pantau halaman ini untuk peluang sponsorship terbaru</p>
-                            <a href="{{ route('event.index') }}" class="inline-block px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors text-sm">
-                                Buat Event Anda
-                            </a>
-                        </div>
-                    @endif
-                </section>
-            @endif
-
-            <!-- MARKETPLACE EVENT TAB -->
-            @if(auth()->user()->role === 'company' || auth()->user()->role === 'event' || auth()->user()->role === 'admin')
-                <section x-show="activeTab === 'events'" x-transition class="space-y-8">
-                    @if($events->count() > 0)
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-900 mb-2">Event Mencari Sponsor</h2>
-                            <p class="text-slate-500 text-sm">{{ $events->count() }} event siap untuk kolaborasi</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-                            @foreach($events as $event)
-                                <div class="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-indigo-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                                    
-                                    <!-- Image Section with Badge -->
-                                    <div class="relative h-44 overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50">
-                                        @if($event->poster_image)
-                                            <img src="{{ asset('storage/' . $event->poster_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                        @else
-                                            <div class="flex items-center justify-center h-full">
-                                                <div class="text-center">
-                                                    <svg class="w-12 h-12 text-indigo-200 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                    <p class="text-indigo-300 text-xs font-semibold">Event Poster</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <!-- Badge -->
-                                        <div class="absolute top-3 right-3">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5.5.75A.75.75 0 016.25 0h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 015.5.75zM3 6a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6zm12 1.75a.75.75 0 000 1.5h.008a.75.75 0 000-1.5H15zm.375 2.5a.375.375 0 100-.75.375.375 0 00.75zM15 12.75a.75.75 0 000 1.5h.008a.75.75 0 000-1.5H15zm0 2a.75.75 0 000 1.5h.008a.75.75 0 000-1.5H15z"></path></svg>
-                                                {{ \Carbon\Carbon::parse($event->event_date)->translatedFormat('d M Y') }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Content Section -->
-                                    <div class="p-6 flex flex-col flex-1">
-                                        <!-- Organizer -->
-                                        <a href="{{ route('user.profile.show', $event->user->id) }}" class="flex items-center gap-3 mb-4 group/user">
-                                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-700 flex items-center justify-center font-bold border-2 border-indigo-200 group-hover/user:border-indigo-400 transition-colors">
-                                                {{ substr($event->user->profile->organization_name ?? $event->user->name ?? 'O', 0, 1) }}
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-slate-900 group-hover/user:text-indigo-600 transition-colors">{{ $event->user->profile->organization_name ?? $event->user->name ?? 'User' }}</p>
-                                                <p class="text-xs text-slate-400 font-medium">{{ $event->created_at->diffForHumans() }}</p>
-                                            </div>
-                                        </a>
-
-                                        <!-- Title -->
-                                        <h3 class="text-lg font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ $event->title }}</h3>
-
-                                        <!-- Description -->
-                                        <div x-data="{ expanded: false }" class="mb-5 flex-1">
-                                            <p :class="expanded ? '' : 'line-clamp-2'" class="text-slate-600 text-sm leading-relaxed transition-all duration-300">
-                                                {{ $event->description }}
-                                            </p>
-                                            @if(strlen($event->description) > 80)
-                                                <button @click="expanded = !expanded" class="text-indigo-600 text-xs font-semibold mt-2 hover:text-indigo-700 focus:outline-none">
-                                                    <span x-text="expanded ? '▲ Sembunyikan' : '▼ Baca Lebih'"></span>
-                                                </button>
-                                            @endif
-                                        </div>
-
-                                        <!-- Divider -->
-                                        <div class="border-t border-slate-100 pt-4 mt-auto flex gap-2">
-                                            @if($event->proposal_pdf)
-                                                <a href="{{ asset('storage/' . $event->proposal_pdf) }}" target="_blank" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-lg text-xs text-center transition-colors">
-                                                    Proposal
-                                                </a>
-                                            @endif
-                                            
-                                            @if(auth()->user()->role === 'company')
-                                                <a href="{{ route('request.create', ['type' => 'event', 'id' => $event->id]) }}" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-xs text-center transition-all hover:shadow-lg hover:-translate-y-0.5">
-                                                    ✨ Beri Sponsor
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <!-- Empty State -->
-                        <div class="py-16 px-6 text-center">
-                            <div class="inline-block mb-4">
-                                <svg class="w-16 h-16 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2">Belum ada event terbuka</h3>
-                            <p class="text-slate-500 text-sm mb-6">Pantau halaman ini untuk peluang event terbaru</p>
-                            <a href="{{ route('company.index') }}" class="inline-block px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors text-sm">
-                                Buat Penawaran Sponsor
-                            </a>
-                        </div>
-                    @endif
-                </section>
-            @endif
-        </div>
-    </main>
-</div>
-
-<script>
-    const searchInput = document.getElementById('q');
-    const exploreContent = document.getElementById('exploreContent');
-    let searchTimeout;
-
-    function replaceExploreContent(html) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const newContent = doc.getElementById('exploreContent');
-        if (newContent && exploreContent) {
-            exploreContent.innerHTML = newContent.innerHTML;
-            if (window.Alpine) {
-                window.Alpine.initTree(exploreContent);
-            }
-        }
-    }
-
-    function updateSearch() {
-        const query = searchInput.value.trim();
-        const url = new URL('{{ route('explore.index') }}', window.location.origin);
-
-        if (query) {
-            url.searchParams.set('q', query);
-        }
-
-        // Preserve filter parameters
-        const eventTypeFilter = document.getElementById('eventTypeFilter');
-        const fundingTypeFilter = document.getElementById('fundingTypeFilter');
-        
-        if (eventTypeFilter && eventTypeFilter.value) {
-            url.searchParams.set('event_type', eventTypeFilter.value);
-        }
-        if (fundingTypeFilter && fundingTypeFilter.value) {
-            url.searchParams.set('funding_type', fundingTypeFilter.value);
-        }
-
-        fetch(url.toString(), {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-            .then(response => response.text())
-            .then(html => {
-                replaceExploreContent(html);
-                window.history.replaceState({}, '', url.toString());
-                searchInput.focus();
-                const len = searchInput.value.length;
-                searchInput.setSelectionRange(len, len);
-            })
-            .catch(() => {
-                if (!query) {
-                    window.location.href = url.toString();
+    <!-- Script SETELAH modal agar getElementById bisa menemukan elemen -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('exploreComponent', () => ({
+                activeTab: '{{ auth()->user()->role === 'company' ? 'events' : 'offers' }}',
+                profileModalOpen: false,
+                selectedProfile: null,
+                loadingProfile: false,
+                async openProfileModal(userId) {
+                    this.loadingProfile = true;
+                    this.profileModalOpen = true;
+                    this.selectedProfile = null;
+                    
+                    try {
+                        const response = await fetch(`/user/${userId}/profile`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            this.selectedProfile = result.data;
+                        } else {
+                            alert(result.message || 'Gagal memuat profil');
+                            this.profileModalOpen = false;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching profile:', error);
+                        alert('Terjadi kesalahan saat memuat profil');
+                        this.profileModalOpen = false;
+                    } finally {
+                        this.loadingProfile = false;
+                    }
                 }
+            }));
+        });
+
+        const searchInput = document.getElementById('q');
+        const exploreContent = document.getElementById('exploreContent');
+        let searchTimeout;
+
+        function replaceExploreContent(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContent = doc.getElementById('exploreContent');
+            if (newContent && exploreContent) {
+                exploreContent.innerHTML = newContent.innerHTML;
+                if (window.Alpine) {
+                    window.Alpine.initTree(exploreContent);
+                }
+            }
+        }
+
+        function updateSearch() {
+            const query = searchInput.value.trim();
+            const url = new URL('{{ route('explore.index') }}', window.location.origin);
+
+            if (query) {
+                url.searchParams.set('q', query);
+            }
+
+            const eventTypeFilter = document.getElementById('eventTypeFilter');
+            const fundingTypeFilter = document.getElementById('fundingTypeFilter');
+            
+            if (eventTypeFilter && eventTypeFilter.value) {
+                url.searchParams.set('event_type', eventTypeFilter.value);
+            }
+            if (fundingTypeFilter && fundingTypeFilter.value) {
+                url.searchParams.set('funding_type', fundingTypeFilter.value);
+            }
+
+            fetch(url.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    replaceExploreContent(html);
+                    window.history.replaceState({}, '', url.toString());
+                    searchInput.focus();
+                    const len = searchInput.value.length;
+                    searchInput.setSelectionRange(len, len);
+                })
+                .catch(() => {
+                    if (!query) {
+                        window.location.href = url.toString();
+                    }
+                });
+        }
+
+        function handleSearchInput() {
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            searchTimeout = setTimeout(updateSearch, 700);
+        }
+
+        function applyFilters() {
+            const url = new URL('{{ route('explore.index') }}', window.location.origin);
+            const query = searchInput?.value.trim();
+            
+            if (query) {
+                url.searchParams.set('q', query);
+            }
+
+            const eventTypeFilter = document.getElementById('eventTypeFilter');
+            const fundingTypeFilter = document.getElementById('fundingTypeFilter');
+            
+            if (eventTypeFilter && eventTypeFilter.value) {
+                url.searchParams.set('event_type', eventTypeFilter.value);
+            }
+            if (fundingTypeFilter && fundingTypeFilter.value) {
+                url.searchParams.set('funding_type', fundingTypeFilter.value);
+            }
+
+            window.location.href = url.toString();
+        }
+
+        searchInput?.addEventListener('input', handleSearchInput);
+
+        document.getElementById('eventTypeFilter')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+        document.getElementById('fundingTypeFilter')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+
+        // Request Modal Functions
+        let currentRequestData = { type: null, targetId: null, targetTitle: null };
+
+        function openRequestModal(type, targetId, targetTitle) {
+            currentRequestData = { type, targetId, targetTitle };
+            document.getElementById('requestModalTitle').textContent = type === 'offer' 
+                ? 'Ajukan Proposal Sponsor' 
+                : 'Tawarkan Program Sponsor';
+            document.getElementById('requestModalTarget').innerHTML = `<strong>${targetTitle}</strong>`;
+            document.getElementById('requestType').value = type;
+            document.getElementById('requestTargetId').value = targetId;
+            document.getElementById('requestMessage').value = '';
+            loadAssets(type);
+            document.getElementById('requestModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRequestModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function loadAssets(type) {
+            const targetId = currentRequestData.targetId;
+            const endpoint = `/request/create/${type}/${targetId}`;
+            const submitBtn = document.querySelector('#requestForm button[type="submit"]');
+            
+            // Reset submit button
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            fetch(endpoint, {
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('requestAssetId');
+                
+                if (data.success && Array.isArray(data.assets) && data.assets.length > 0) {
+                    select.innerHTML = '<option value="" disabled selected>-- Silakan Pilih --</option>';
+                    data.assets.forEach(asset => {
+                        select.innerHTML += `<option value="${asset.id}">${asset.title}</option>`;
+                    });
+                } else {
+                    // Tampilkan pesan error dari server atau default
+                    const msg = data.message || 'Tidak ada aset tersedia';
+                    select.innerHTML = `<option value="" disabled selected>${msg}</option>`;
+                    // Disable submit button
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading assets:', error);
+                document.getElementById('requestAssetId').innerHTML = '<option value="" disabled selected>Gagal memuat data</option>';
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             });
-    }
-
-    function handleSearchInput() {
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        searchTimeout = setTimeout(updateSearch, 700);
-    }
-
-    function applyFilters() {
-        const url = new URL('{{ route('explore.index') }}', window.location.origin);
-        const query = searchInput?.value.trim();
-        
-        if (query) {
-            url.searchParams.set('q', query);
         }
 
-        const eventTypeFilter = document.getElementById('eventTypeFilter');
-        const fundingTypeFilter = document.getElementById('fundingTypeFilter');
-        
-        if (eventTypeFilter && eventTypeFilter.value) {
-            url.searchParams.set('event_type', eventTypeFilter.value);
-        }
-        if (fundingTypeFilter && fundingTypeFilter.value) {
-            url.searchParams.set('funding_type', fundingTypeFilter.value);
-        }
+        // Event listener untuk submit form
+        document.getElementById('requestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const type = document.getElementById('requestType').value;
+            const assetId = document.getElementById('requestAssetId').value;
+            const message = document.getElementById('requestMessage').value;
 
-        window.location.href = url.toString();
-    }
+            if (!assetId || !message.trim()) {
+                alert('Mohon isi semua field!');
+                return;
+            }
 
-    searchInput?.addEventListener('input', handleSearchInput);
+            const formData = new FormData();
+            formData.append('target_type', type);
+            formData.append('target_id', currentRequestData.targetId);
+            formData.append('my_asset_id', assetId);
+            formData.append('message', message);
 
-    // Allow Enter key on filter inputs
-    document.getElementById('eventTypeFilter')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') applyFilters();
-    });
-    document.getElementById('fundingTypeFilter')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') applyFilters();
-    });
-</script>
-<style>
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f1f5f9; 
-        border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-    }
-</style>
+            fetch('{{ route("request.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Pengajuan berhasil dikirim!');
+                    closeRequestModal();
+                } else {
+                    alert('❌ Error: ' + (data.message || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Gagal mengirim pengajuan');
+            });
+        });
 
-</body>
-</html>
+        // Close modal on outside click
+        document.getElementById('requestModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRequestModal();
+            }
+        });
+    </script>
+
+@endsection

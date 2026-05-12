@@ -34,7 +34,7 @@ class VerifyAccountStatus
         }
 
         // Jika user statusnya pending dan sudah complete profile, arahkan ke waiting verification
-        // Tapi ijinkan akses ke profile.waiting_verification dan logout
+        // Tapi ijinkan akses ke profile.waiting_verification, logout, dan profile.edit
         if ($user->verification_status === 'pending' && $user->hasCompletedProfile()) {
             $routeAllowed = ['profile.waiting_verification', 'logout', 'profile.edit'];
             if (!$request->routeIs($routeAllowed)) {

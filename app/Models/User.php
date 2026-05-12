@@ -96,4 +96,16 @@ class User extends Authenticatable
     {
         return $this->unreadNotifications()->count();
     }
+
+    // Relasi: Satu user memiliki banyak events (One-to-Many)
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    // Relasi: Satu user memiliki banyak sponsor offers (One-to-Many)
+    public function sponsorOffers()
+    {
+        return $this->hasMany(SponsorOffer::class);
+    }
 }

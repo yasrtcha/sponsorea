@@ -50,7 +50,9 @@ class MoUUploadedNotification extends Notification
         }
 
         return [
-            'message' => 'MoU telah diunggah oleh ' . $this->uploader->name . ' untuk kerjasama "' . $this->sponsorshipRequest->event->title . '" dan "' . $this->sponsorshipRequest->sponsorOffer->title . '".',
+            'name' => $this->uploader->name,
+            'action' => 'mengunggah MoU',
+            'message' => 'MoU telah diunggah untuk kerjasama "' . $this->sponsorshipRequest->event->title . '" dan "' . $this->sponsorshipRequest->sponsorOffer->title . '".',
             'url' => $url,
         ];
     }
