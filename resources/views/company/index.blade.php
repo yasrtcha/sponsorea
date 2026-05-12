@@ -51,6 +51,7 @@
                         <tr class="bg-gray-50/50 border-b border-gray-100">
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Nama Program</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Jenis Bantuan</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Batas Akhir</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest text-center">Status</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest text-right">Aksi</th>
                         </tr>
@@ -65,6 +66,26 @@
                                 <span class="bg-[#f5f4f0] text-gray-600 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border border-gray-100">
                                     {{ $offer->funding_type }}
                                 </span>
+                            </td>
+                            <td class="p-5">
+                                @if($offer->deadline)
+                                    @php
+                                        $now = \Carbon\Carbon::now()->startOfDay();
+                                        $isExpired = $offer->deadline->startOfDay() < $now;
+                                    @endphp
+                                    @if($isExpired)
+                                        <span class="inline-flex items-center px-2.5 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-red-100">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                            Berakhir
+                                        </span>
+                                    @else
+                                        <div class="text-[12px] font-semibold text-gray-700">
+                                            {{ $offer->deadline->setTimezone('Asia/Jakarta')->format('d M Y') }}
+                                        </div>
+                                    @endif
+                                @else
+                                    <span class="text-gray-400 text-[11px] font-semibold">Tanpa Batas</span>
+                                @endif
                             </td>
                             <td class="p-5 text-center">
                                 @if($offer->status == 'active')

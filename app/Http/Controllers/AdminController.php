@@ -72,9 +72,29 @@ class AdminController extends Controller
 
     public function verifications()
     {
-        $pending = User::where('verification_status', 'pending')->with('profile')->latest()->get();
-        $approved = User::where('verification_status', 'verified')->with('profile')->orderBy('verified_at', 'desc')->take(10)->get();
-        $rejected = User::where('verification_status', 'rejected')->with('profile')->orderBy('updated_at', 'desc')->take(10)->get();
+        // Hanya tampilkan user yang sudah lengkap mengisi profile
+        $pending = User::where('verification_status', 'pending')
+            ->whereIn('role', ['event', 'company'])
+            ->whereHas('profile')
+            ->with('profile')
+            ->latest()
+            ->get();
+            
+        $approved = User::where('verification_status', 'verified')
+            ->whereIn('role', ['event', 'company'])
+            ->whereHas('profile')
+            ->with('profile')
+            ->orderBy('verified_at', 'desc')
+            ->take(10)
+            ->get();
+            
+        $rejected = User::where('verification_status', 'rejected')
+            ->whereIn('role', ['event', 'company'])
+            ->whereHas('profile')
+            ->with('profile')
+            ->orderBy('updated_at', 'desc')
+            ->take(10)
+            ->get();
         
         return view('admin.verifications', compact('pending', 'approved', 'rejected'));
     }

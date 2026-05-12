@@ -202,6 +202,33 @@
                                         </span>
                                     </div>
                                     
+                                    <!-- Deadline Badge -->
+                                    @if($offer->deadline)
+                                        @php
+                                            $now = \Carbon\Carbon::now()->startOfDay();
+                                            $isExpired = $offer->deadline->startOfDay() < $now;
+                                        @endphp
+                                        <div class="mb-2.5">
+                                            @if($isExpired)
+                                                <span class="inline-flex items-center px-2 py-1 rounded bg-red-50 text-red-600 text-[9px] font-extrabold uppercase tracking-wider border border-red-100">
+                                                    <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                                    Berakhir
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-1 rounded bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase tracking-wider border border-emerald-100">
+                                                    <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                    Hingga {{ $offer->deadline->setTimezone('Asia/Jakarta')->format('d M Y') }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="mb-2.5">
+                                            <span class="inline-flex items-center px-2 py-1 rounded bg-gray-50 text-gray-500 text-[9px] font-extrabold uppercase tracking-wider border border-gray-100">
+                                                Tanpa Batas
+                                            </span>
+                                        </div>
+                                    @endif
+                                    
                                     <!-- Description -->
                                     <div x-data="{ expanded: false }" class="mb-5 flex-grow">
                                         <p :class="expanded ? '' : 'line-clamp-2'" class="text-xs text-gray-500 break-words leading-relaxed">

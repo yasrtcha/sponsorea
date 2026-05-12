@@ -18,6 +18,11 @@ class SponsorOffer extends Model
         'funding_type',
         'guideline_pdf',
         'status',
+        'deadline',
+    ];
+
+    protected $casts = [
+        'deadline' => 'datetime',
     ];
 
     public function user()

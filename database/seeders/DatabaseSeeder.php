@@ -28,36 +28,5 @@ class DatabaseSeeder extends Seeder
                 'role' => 'admin',
             ]
         );
-
-        // 2. Akun Mahasiswa (Penyelenggara Event) - Fixed
-        User::create([
-            'name' => 'FORMAPI Universitas Brawijaya',
-            'email' => 'mahasiswa@ub.ac.id',
-            'password' => Hash::make('password'),
-            'role' => 'Event',
-            'verification_status' => 'pending',
-            'verified_at' => now(),
-        ]);
-
-        // 3. Akun Perusahaan (Sponsor) - Fixed
-        User::create([
-            'name' => 'Wuffy Space Sawojajar',
-            'email' => 'partnership@wuffyspace.com',
-            'password' => Hash::make('password'),
-            'role' => 'Company',
-            'verification_status' => 'pending',
-            'verified_at' => now(),
-        ]);
-
-        // 4. Menambah akun acak untuk testing verifikasi admin (Status: Menunggu)
-        User::factory()->count(5)->create([
-            'role' => 'Event',
-            'verification_status' => 'pending',
-        ]);
-
-        User::factory()->count(3)->create([
-            'role' => 'Company',
-            'verification_status' => 'pending',
-        ]);
     }
 }

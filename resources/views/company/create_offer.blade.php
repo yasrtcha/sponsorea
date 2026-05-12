@@ -35,6 +35,15 @@
         </div>
 
         <div>
+            <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Batas Akhir Pengajuan (Opsional)</label>
+            <input type="date" name="deadline" value="{{ old('deadline') }}" 
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all" 
+                   placeholder="Pilih tanggal deadline">
+            <p class="text-[11px] text-gray-500 font-medium mt-1.5">Kosongkan jika penawaran tidak ada batas waktu berlaku.</p>
+            @error('deadline') <span class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
             <label class="block text-[11px] font-extrabold text-[#3d3d3d] uppercase tracking-widest mb-2.5">Deskripsi & Syarat Pengajuan</label>
             <textarea name="description" rows="4" 
                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f07b32]/20 focus:border-[#f07b32] bg-gray-50/30 text-[13px] font-medium text-[#3d3d3d] focus:outline-none transition-all resize-none" 

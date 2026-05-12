@@ -20,6 +20,7 @@ return new class extends Migration
         $table->string('funding_type'); // Misal: "Dana Tunai", "Barang/Produk", "Media Partner"
         $table->string('guideline_pdf')->nullable(); // File syarat/ketentuan PDF (opsional)
         $table->enum('status', ['active', 'inactive'])->default('active');
+        $table->dateTime('deadline')->nullable(); // Batas akhir pengajuan
         $table->timestamps();
     });
     }

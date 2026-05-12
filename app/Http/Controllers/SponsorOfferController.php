@@ -28,6 +28,7 @@ class SponsorOfferController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'funding_type' => 'required|string',
+            'deadline' => 'nullable|date_format:Y-m-d|after_or_equal:today',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'guideline_pdf' => 'nullable|mimes:pdf|max:5120',
         ]);
@@ -49,6 +50,7 @@ class SponsorOfferController extends Controller
             'funding_type' => $request->funding_type,
             'banner_image' => $bannerPath,
             'guideline_pdf' => $pdfPath,
+            'deadline' => $request->deadline ? \Carbon\Carbon::createFromFormat('Y-m-d', $request->deadline)->endOfDay() : null,
             'status' => 'active',
         ]);
 
@@ -73,11 +75,17 @@ class SponsorOfferController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'funding_type' => 'required|string',
+            'deadline' => 'nullable|date_format:Y-m-d|after_or_equal:today',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'guideline_pdf' => 'nullable|mimes:pdf|max:5120',
         ]);
 
         $data = $request->only(['title', 'description', 'funding_type']);
+        if ($request->deadline) {
+            $data['deadline'] = \Carbon\Carbon::createFromFormat('Y-m-d', $request->deadline)->endOfDay();
+        } else {
+            $data['deadline'] = null;
+        }
 
         if ($request->hasFile('banner_image')) {
             if ($sponsorOffer->banner_image && Storage::disk('public')->exists($sponsorOffer->banner_image)) {
