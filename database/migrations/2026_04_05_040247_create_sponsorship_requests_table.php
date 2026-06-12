@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('initiator', ['event', 'company']); 
             
             // Status transaksi
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'awaiting_mou', 'approved', 'rejected'])->default('pending');
             
             // Pesan pengantar (Opsional, misal: "Halo kak, event kami cocok nih!")
             $table->text('message')->nullable(); 

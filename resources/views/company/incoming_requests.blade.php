@@ -58,12 +58,29 @@
                                             <button type="submit" class="bg-teal-500 text-white hover:bg-teal-600 px-4 py-2 rounded-xl text-[11px] font-extrabold uppercase tracking-wider transition-all hover:shadow-md shadow-teal-500/20">Terima</button>
                                         </form>
                                     </div>
+                                @elseif($req->status === 'awaiting_mou')
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span class="inline-flex items-center px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-orange-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5 align-middle animate-pulse"></span>
+                                                Menunggu MoU
+                                            </span>
+                                        </div>
+                                        @if(!$req->mou_path)
+                                            <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-wider">Menunggu MoU...</span>
+                                        @else
+                                            <a href="{{ asset('storage/' . $req->mou_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border border-transparent hover:shadow-sm transition-all mt-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Lihat MoU
+                                            </a>
+                                        @endif
+                                    </div>
                                 @elseif($req->status === 'approved')
                                     <div class="space-y-2">
                                         <div class="flex items-center justify-center gap-2">
                                             <span class="inline-flex items-center px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-teal-100">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mr-1.5 align-middle"></span>
-                                                Disetujui
+                                                Diterima
                                             </span>
                                         </div>
                                         @if($req->mou_path)
@@ -71,8 +88,6 @@
                                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                 Lihat MoU
                                             </a>
-                                        @else
-                                            <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">Menunggu MoU...</span>
                                         @endif
                                     </div>
                                 @else

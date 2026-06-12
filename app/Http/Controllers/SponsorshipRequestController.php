@@ -259,19 +259,23 @@ class SponsorshipRequestController extends Controller
 
         // Update status dan rejection_notes jika ada
         $updateData = ['status' => $request->status];
-        if ($request->status === 'rejected' && $request->rejection_notes) {
+        
+        // Jika approve, ubah ke awaiting_mou (bukan langsung approved)
+        if ($request->status === 'approved') {
+            $updateData['status'] = 'awaiting_mou';
+        } elseif ($request->status === 'rejected' && $request->rejection_notes) {
             $updateData['rejection_notes'] = $request->rejection_notes;
         }
         
         $sponsorshipRequest->update($updateData);
 
         // Send notifications to the initiator
-        if ($request->status === 'approved') {
+        if ($updateData['status'] === 'awaiting_mou') {
             $initiatorUser = $sponsorshipRequest->initiator === 'event' 
                 ? $sponsorshipRequest->event->user 
                 : $sponsorshipRequest->sponsorOffer->user;
             $initiatorUser->notify(new SponsorshipRequestApprovedNotification($sponsorshipRequest));
-        } else {
+        } elseif ($request->status === 'rejected') {
             $initiatorUser = $sponsorshipRequest->initiator === 'event' 
                 ? $sponsorshipRequest->event->user 
                 : $sponsorshipRequest->sponsorOffer->user;
@@ -359,9 +363,9 @@ class SponsorshipRequestController extends Controller
     {
         $sponsorshipRequest = SponsorshipRequest::findOrFail($id);
 
-        // VALIDASI: Hanya bisa upload jika status approved
-        if ($sponsorshipRequest->status !== 'approved') {
-            return back()->with('error', 'Kontrak MoU hanya bisa di-upload setelah kerjasama disetujui!');
+        // VALIDASI: Hanya bisa upload jika status awaiting_mou (bukan approved lagi)
+        if ($sponsorshipRequest->status !== 'awaiting_mou') {
+            return back()->with('error', 'Kontrak MoU hanya bisa di-upload setelah kerjasama disetujui dan menunggu upload!');
         }
 
         // KEAMANAN: HANYA MAHASISWA (EVENT) YANG BISA UPLOAD MoU
@@ -392,10 +396,11 @@ class SponsorshipRequestController extends Controller
         $fileName = 'mou_' . $sponsorshipRequest->id . '_' . time() . '.pdf';
         $filePath = $file->storeAs('mou_contracts', $fileName, 'public');
 
-        // UPDATE DATABASE
+        // UPDATE DATABASE - Change status to approved saat MoU diupload
         $sponsorshipRequest->update([
             'mou_path' => $filePath,
-            'mou_uploaded_at' => now()
+            'mou_uploaded_at' => now(),
+            'status' => 'approved'  // Baru disini status jadi approved
         ]);
 
         // Send notification to the sponsor company

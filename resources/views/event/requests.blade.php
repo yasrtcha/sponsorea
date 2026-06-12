@@ -36,11 +36,11 @@
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 align-middle"></span>
                                         Menunggu
                                     </span>
-                                @elseif($req->status === 'approved')
+                                @elseif($req->status === 'awaiting_mou')
                                     <div class="flex flex-col items-center gap-2">
-                                        <span class="inline-flex items-center px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-teal-100">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mr-1.5 align-middle"></span>
-                                            Diterima
+                                        <span class="inline-flex items-center px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-orange-100">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5 align-middle animate-pulse"></span>
+                                            Menunggu MoU
                                         </span>
                                         @if(!$req->mou_path)
                                             <button onclick="openMoUModal({{ $req->id }}, '{{ $req->event->title }}', '{{ $req->sponsorOffer->user->profile->company_name ?? 'Perusahaan' }}')" class="inline-flex items-center gap-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border border-transparent hover:shadow-sm transition-all mt-1">
@@ -48,6 +48,19 @@
                                                 Upload MoU
                                             </button>
                                         @else
+                                            <a href="{{ asset('storage/' . $req->mou_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border border-transparent hover:shadow-sm transition-all mt-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Lihat MoU
+                                            </a>
+                                        @endif
+                                    </div>
+                                @elseif($req->status === 'approved')
+                                    <div class="flex flex-col items-center gap-2">
+                                        <span class="inline-flex items-center px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-teal-100">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mr-1.5 align-middle"></span>
+                                            Diterima
+                                        </span>
+                                        @if($req->mou_path)
                                             <a href="{{ asset('storage/' . $req->mou_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border border-transparent hover:shadow-sm transition-all mt-1">
                                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                 Lihat MoU
